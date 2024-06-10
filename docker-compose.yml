@@ -1,0 +1,24 @@
+
+volumes:
+  node-modules-cache:
+    name: pitch-trainer-node-modules-cache
+  frontend-node-modules:
+    name: pitch-trainer-frontend-node-modules
+  
+
+services:
+
+  # Angular 18 frontend
+  # http://localhost:4200
+  # TODO: don't run the container as root
+  frontend:
+    container_name:
+      pitch-trainer-frontend
+    build:
+      dockerfile: ./docker/frontend.Dockerfile
+    volumes:
+      - ./app:/app
+      - frontend-node-modules:/app/node_modules
+      - node-modules-cache:/root/.npm
+    ports:
+      - 4200:4200
