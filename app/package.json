@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "format": "prettier --write ./src"
   },
   "license": "MIT",
   "dependencies": {
@@ -34,6 +35,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "postcss": "^8.4.38",
+    "prettier": "^3.3.1",
     "tailwindcss": "^3.4.4",
     "tslib": "^2.6.3",
     "typescript": "~5.4.2"
