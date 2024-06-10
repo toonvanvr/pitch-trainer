@@ -1,4 +1,4 @@
-FROM node:22-alpine
+FROM node:22
 
 RUN npm i -g @angular/cli@18
 
@@ -6,6 +6,7 @@ RUN npm i -g @angular/cli@18
 VOLUME /root/.npm
 
 # Angular
+RUN mkdir -p /app/node_modules
 VOLUME /app
 VOLUME /app/node_modules
 WORKDIR /app
