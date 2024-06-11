@@ -29,32 +29,25 @@ export class PitchDetectionService {
     switchMap((pitchDetection) => {
       if (!pitchDetection) {
         return of(null)
-      } else {
-        let listening = true
-        return new Observable<number | null>((subscriber) => {
-          const getPitchWhileListening = async () => {
-            if (listening) {
-              const freq = await pitchDetection.getPitch((error, frequency) => {
-                if (error) {
-                  subscriber.error(error)
-                } else {
-                  // also filter out delayed responses in case the frontend
-                  // logic assumes no output comes after unsubscribing
-                  if (listening) {
-                    subscriber.next(frequency)
-                    getPitchWhileListening()
-                  }
-                }
-              })
-            }
-          }
-          getPitchWhileListening()
-        }).pipe(
-          onUnsubscribe(() => {
-            listening = false
-          }),
-        )
       }
+
+      let listening = true
+      return new Observable<number | null>((subscriber) => {
+        const getPitchWhileListening = async () => {
+          try {
+            if (listening) {
+              const frequency = await pitchDetection.getPitch()
+              if (listening) {
+                subscriber.next(frequency)
+                getPitchWhileListening()
+              }
+            }
+          } catch (error) {
+            subscriber.error(error)
+          }
+        }
+        getPitchWhileListening()
+      }).pipe(onUnsubscribe(() => (listening = false)))
     }),
   )
 }
