@@ -23,7 +23,7 @@ export type Beat = BeatTickLookup['highlightedBeats'][number]['beat']
 export type Note = Beat['notes'][number]
 
 export interface PlayedNote {
-  index: number
+  noteIndex: number
   frequency: number
   start: number
   end: number
@@ -140,7 +140,7 @@ export class SheetMusicService {
                 for (const beat of voice.beats) {
                   for (const note of beat.notes) {
                     playedNotes.push({
-                      index: note.realValue,
+                      noteIndex: note.realValue,
                       frequency: noteIndexFrequencies[note.realValue],
                       start: beat.absolutePlaybackStart,
                       end:
@@ -167,26 +167,31 @@ export class SheetMusicService {
           return null
         }
 
-        let min = Infinity
-        let max = -Infinity
-        let minNote
-        let maxNote
+        let minIndex = Infinity
+        let maxIndex = -Infinity
+        let minNoteIndex
+        let maxNoteIndex
         for (const sound of sounds) {
-          if (sound.frequency < min) {
-            min = sound.frequency
-            minNote = sound
+          if (sound.noteIndex < minIndex) {
+            minIndex = sound.noteIndex
+            minNoteIndex = sound
           }
-          if (sound.frequency > max) {
-            max = sound.frequency
-            maxNote = sound
+          if (sound.noteIndex > maxIndex) {
+            maxIndex = sound.noteIndex
+            maxNoteIndex = sound
           }
         }
 
-        if (!minNote || !maxNote) {
+        if (!minNoteIndex || !maxNoteIndex) {
           return null
         }
 
-        return { min, max, minNote, maxNote }
+        return {
+          minNoteIndex: minIndex,
+          maxNoteIndex: maxIndex,
+          minNote: minNoteIndex,
+          maxNote: maxNoteIndex,
+        }
       }),
     )
 

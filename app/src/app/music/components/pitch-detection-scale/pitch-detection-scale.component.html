@@ -1,0 +1,4 @@
+<div *ngFor="let item of (scale$ | async)" class="note grow text-xs flex items-center justify-center"
+  [ngClass]="{'is-singing': item.isSinging}" [ngStyle]="{backgroundColor: item.bgColor}">
+  {{ item.noteName }}
+</div>

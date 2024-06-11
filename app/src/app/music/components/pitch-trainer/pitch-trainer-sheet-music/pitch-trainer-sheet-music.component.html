@@ -12,8 +12,8 @@
 <ng-container *ngIf="(extrema$ | async) as extrema">
   <div>
     Extrema:
-    {{ extrema.minNote.index}} {{ extrema.minNote.frequency }}
-    {{ extrema.maxNote.index}} {{ extrema.maxNote.frequency }}
+    {{ extrema.minNote.noteIndex }} {{ extrema.minNote.frequency }}
+    {{ extrema.maxNote.noteIndex }} {{ extrema.maxNote.frequency }}
   </div>
 </ng-container>
 

@@ -26,3 +26,24 @@ export const noteIndexNames = noteIndexFrequencies.map((f, i) => {
   const octave = Math.floor(i / 12)
   return `${name}${octave}`
 })
+
+export function noteColor(
+  noteIndex: number,
+  octave: number | null = null,
+): string {
+  octave ??= Math.floor(noteIndex / 12)
+  // hue range centra go from 180 degrees to 300 degrees (lightblue to pink)
+  const octaveHueStep = (300 - 180) / 12
+  // the note index within the scale has less impact on the coloring
+  const noteHueRange = octaveHueStep / 6
+  const noteHueStep = noteHueRange / 12
+  const innerOctaveIndex = noteIndex % 12
+
+  const hue =
+    180 +
+    octave * octaveHueStep -
+    innerOctaveIndex * noteHueStep -
+    noteHueRange / 2
+
+  return `hsla(${hue}, 100%, 50%, 75%)`
+}
