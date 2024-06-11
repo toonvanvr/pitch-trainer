@@ -21,8 +21,5 @@ import { PitchTrainerSlidingChartComponent } from './pitch-trainer-sliding-chart
   styleUrl: './pitch-trainer.component.scss',
 })
 export class PitchTrainerComponent {
-  constructor(private readonly sheetMusic: SheetMusicService) {
-    const examFileUrl = new URL('/scores/examen-zang.tex', window.location.href)
-    this.sheetMusic.loadFile(examFileUrl)
-  }
+  constructor(private readonly sheetMusic: SheetMusicService) {}
 }
