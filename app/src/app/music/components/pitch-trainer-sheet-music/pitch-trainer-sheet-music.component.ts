@@ -1,9 +1,7 @@
 import { Component } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import * as alphaTab from '@coderline/alphatab'
-
-// @ts-ignore
-globalThis.alphatab = alphaTab
+import { AlphaTabApiOptions } from '../../../core/types/alphatab.module'
 
 @Component({
   selector: 'app-pitch-trainer-sheet-music',
@@ -19,22 +17,20 @@ export class PitchTrainerSheetMusicComponent {
     const main = wrapper.querySelector('.at-main') as HTMLElement
 
     // initialize alphatab
-    const api = new alphaTab.AlphaTabApi(main, {
-      // @ts-ignore
+    const settings: AlphaTabApiOptions = {
+      file: 'http://localhost:4200/scores/examen-zang.tex',
       core: {
         fontDirectory: '/assets/alphatab/font/',
-        // useWorkers: false, // scriptFile doesn't seem to change the worker.js download url
-        // scriptFile: '/assets/alphatab/alphaTab.js',
       },
-      file: 'http://localhost:4200/scores/examen-zang.tex',
-      // @ts-ignore
       player: {
         enablePlayer: true,
-        outputMode: alphaTab.PlayerOutputMode.WebAudioScriptProcessor, // FIXME: audio worklets don't seem to work ... ?
-        soundFont: '/assets/alphatab/soundfont/sonivox.sf2',
         scrollElement: wrapper.querySelector('.at-viewport') as HTMLElement,
+        soundFont: '/assets/alphatab/soundfont/sonivox.sf2',
+        // FIXME: audio worklets don't seem to work ... ?
+        outputMode: alphaTab.PlayerOutputMode.WebAudioScriptProcessor,
       },
-    } satisfies alphaTab.Settings)
+    }
+    const api = new alphaTab.AlphaTabApi(main, settings)
 
     api.onError = (e) => {
       console.error('CAUGHT ERROR', e)
