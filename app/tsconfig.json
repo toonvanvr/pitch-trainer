@@ -20,7 +20,7 @@
     "module": "ES2022",
     "useDefineForClassFields": false,
     "lib": [
-      "ES2022",
+      "ESNext", // Symbol.dispose for angular compiler, not for typescript compiler, that works for ES2022 somehow
       "dom"
     ]
   },

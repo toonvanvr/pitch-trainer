@@ -1,1 +1,11 @@
 <p>pitch-trainer works!</p>
+
+<input type="button" value="start" (click)="enabled$.next(!enabled$.getValue())">
+
+<p>
+  Enabled: {{ enabled$ | async }}
+</p>
+
+<p>
+  Pitch: {{ pitch$ | async }}
+</p>
