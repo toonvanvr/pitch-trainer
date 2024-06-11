@@ -17,11 +17,9 @@ import { PitchTrainerSheetMusicComponent } from '../pitch-trainer-sheet-music/pi
   styleUrl: './pitch-trainer.component.scss',
 })
 export class PitchTrainerComponent {
-  pitchDetectionEnabled$: Observable<boolean>
   pitch$: Observable<number | null>
 
   constructor(private readonly pitchDetectionService: PitchDetectionService) {
-    this.pitchDetectionEnabled$ = pitchDetectionService.enabled$
     this.pitch$ = pitchDetectionService.pitch$
   }
 }
