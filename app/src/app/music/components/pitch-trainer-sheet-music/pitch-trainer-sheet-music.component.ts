@@ -13,7 +13,7 @@ globalThis.alphatab = alphaTab
   styleUrl: './pitch-trainer-sheet-music.component.scss',
 })
 export class PitchTrainerSheetMusicComponent {
-  ngAfterContentInit(): void {
+  ngAfterContentInit() {
     // load elements
     const wrapper = document.querySelector('.at-wrap') as HTMLElement
     const main = wrapper.querySelector('.at-main') as HTMLElement
@@ -31,7 +31,7 @@ export class PitchTrainerSheetMusicComponent {
       player: {
         enablePlayer: true,
         outputMode: alphaTab.PlayerOutputMode.WebAudioScriptProcessor, // FIXME: audio worklets don't seem to work ... ?
-        // soundFont: '/assets/alphatab/soundfont/sonivox.sf2',
+        soundFont: '/assets/alphatab/soundfont/sonivox.sf2',
         scrollElement: wrapper.querySelector('.at-viewport') as HTMLElement,
       },
     } satisfies alphaTab.Settings)
@@ -223,7 +223,7 @@ export class PitchTrainerSheetMusicComponent {
       if (e.state === alphaTab.synth.PlayerState.Playing) {
         icon.setAttribute('fonticon', 'pause')
       } else {
-        icon.setAttribute('fonticon', 'play')
+        icon.setAttribute('fonticon', 'play_arrow')
       }
     })
 
