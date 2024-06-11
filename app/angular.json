@@ -30,13 +30,8 @@
               },
               {
                 "glob": "**/*",
-                "input": "node_modules/@coderline/alphatab/dist/font",
-                "output": "assets/font"
-              },
-              {
-                "glob": "**/*",
-                "input": "node_modules/@coderline/alphatab/dist/soundfont",
-                "output": "assets/soundfont"
+                "input": "node_modules/@coderline/alphatab/dist",
+                "output": "assets/alphatab"
               }
             ],
             "styles": [
@@ -97,13 +92,8 @@
               },
               {
                 "glob": "**/*",
-                "input": "node_modules/@coderline/alphatab/dist/font",
-                "output": "assets/font"
-              },
-              {
-                "glob": "**/*",
-                "input": "node_modules/@coderline/alphatab/dist/soundfont",
-                "output": "assets/soundfont"
+                "input": "node_modules/@coderline/alphatab/dist",
+                "output": "assets/alphatab"
               }
             ],
             "styles": [

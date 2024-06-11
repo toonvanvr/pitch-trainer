@@ -1,3 +1,6 @@
+// @ts-ignore
+globalThis.ALPHATAB_ROOT = 'http://localhost:4200/assets/alphatab/'
+
 import { Component } from '@angular/core'
 import * as alphaTab from '@coderline/alphatab'
 
@@ -16,16 +19,20 @@ export class PitchTrainerSheetMusicComponent {
 
     // initialize alphatab
     const api = new alphaTab.AlphaTabApi(main, {
+      // @ts-ignore
       core: {
-        fontDirectory: 'http://localhost:4200/assets/font/',
+        fontDirectory: '/assets/alphatab/font/',
+        useWorkers: false, // scriptFile doesn't seem to change the worker.js download url
+        // scriptFile: '/assets/alphatab/alphaTab.js',
       },
       file: 'https://www.alphatab.net/files/canon.gp',
+      // @ts-ignore
       player: {
         enablePlayer: true,
-        soundFont: 'http://localhost:4200/assets/soundfont/sonivox.sf2',
+        soundFont: '/assets/alphatab/soundfont/sonivox.sf2',
         scrollElement: wrapper.querySelector('.at-viewport') as HTMLElement,
       },
-    })
+    } satisfies alphaTab.Settings)
 
     api.onError = (e) => {
       console.error('CAUGHT ERROR', e)
