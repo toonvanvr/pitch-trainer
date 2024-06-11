@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router'
-import { PitchTrainerComponent } from '../music/components/pitch-trainer.component'
+import { PitchTrainerComponent } from '../music/components/pitch-trainer/pitch-trainer.component'
 
 export const routes: Routes = [
   {

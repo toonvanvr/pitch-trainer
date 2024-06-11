@@ -5,16 +5,24 @@ import { initPitchDetection } from '../utils/init-pitch-detection'
 
 @Injectable({ providedIn: 'root' })
 export class PitchDetectionService {
+  constructor() {
+    console.log('Creating pitch detection service')
+  }
+
   /**
    * Toggle on pitch detection.
    *
    * User input is required in browsers to enable audio capture, so attach this
    * to a user event like a button click.
    */
-  public readonly enabled$ = new BehaviorSubject<boolean>(false)
+  readonly #enabled$ = new BehaviorSubject<boolean>(false)
+  public readonly enabled$ = this.#enabled$.asObservable()
+  public togglePitchDetection(enabled?: boolean): void {
+    this.#enabled$.next(enabled ?? !this.#enabled$.value)
+  }
 
   /** Pitch detector - null if disabled or error */
-  private readonly pitchDetection$ = this.enabled$.pipe(
+  private readonly pitchDetection$ = this.#enabled$.pipe(
     switchMap(async (enabled) => {
       if (!enabled) {
         return false
