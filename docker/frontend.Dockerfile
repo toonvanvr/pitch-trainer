@@ -11,4 +11,4 @@ VOLUME /app
 VOLUME /app/node_modules
 WORKDIR /app
 EXPOSE 4200
-CMD npm i && npm run start -- --host 0.0.0.0
+CMD yarn install && yarn run start -- --host 0.0.0.0

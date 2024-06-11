@@ -1,13 +1,14 @@
-// @ts-ignore
-globalThis.ALPHATAB_ROOT = 'http://localhost:4200/assets/alphatab/'
-
 import { Component } from '@angular/core'
+import { MatIconModule } from '@angular/material/icon'
 import * as alphaTab from '@coderline/alphatab'
+
+// @ts-ignore
+globalThis.alphatab = alphaTab
 
 @Component({
   selector: 'app-pitch-trainer-sheet-music',
   standalone: true,
-  imports: [],
+  imports: [MatIconModule],
   templateUrl: './pitch-trainer-sheet-music.component.html',
   styleUrl: './pitch-trainer-sheet-music.component.scss',
 })
@@ -22,14 +23,15 @@ export class PitchTrainerSheetMusicComponent {
       // @ts-ignore
       core: {
         fontDirectory: '/assets/alphatab/font/',
-        useWorkers: false, // scriptFile doesn't seem to change the worker.js download url
+        // useWorkers: false, // scriptFile doesn't seem to change the worker.js download url
         // scriptFile: '/assets/alphatab/alphaTab.js',
       },
       file: 'https://www.alphatab.net/files/canon.gp',
       // @ts-ignore
       player: {
         enablePlayer: true,
-        soundFont: '/assets/alphatab/soundfont/sonivox.sf2',
+        outputMode: alphaTab.PlayerOutputMode.WebAudioScriptProcessor, // FIXME: audio worklets don't seem to work ... ?
+        // soundFont: '/assets/alphatab/soundfont/sonivox.sf2',
         scrollElement: wrapper.querySelector('.at-viewport') as HTMLElement,
       },
     } satisfies alphaTab.Settings)
@@ -217,13 +219,11 @@ export class PitchTrainerSheetMusicComponent {
 
     api.playerStateChanged.on((e) => {
       console.log('api.playerStateChanged')
-      const icon = playPause.querySelector('i.fas') as HTMLElement
+      const icon = playPause.querySelector('mat-icon') as HTMLElement
       if (e.state === alphaTab.synth.PlayerState.Playing) {
-        icon.classList.remove('fa-play')
-        icon.classList.add('fa-pause')
+        icon.setAttribute('fonticon', 'pause')
       } else {
-        icon.classList.remove('fa-pause')
-        icon.classList.add('fa-play')
+        icon.setAttribute('fonticon', 'play')
       }
     })
 
