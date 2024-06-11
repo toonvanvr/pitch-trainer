@@ -26,7 +26,7 @@ export class PitchTrainerSheetMusicComponent {
         // useWorkers: false, // scriptFile doesn't seem to change the worker.js download url
         // scriptFile: '/assets/alphatab/alphaTab.js',
       },
-      file: 'https://www.alphatab.net/files/canon.gp',
+      file: 'http://localhost:4200/scores/examen-zang.tex',
       // @ts-ignore
       player: {
         enablePlayer: true,
