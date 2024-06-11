@@ -5,10 +5,6 @@ import { initPitchDetection } from '../utils/init-pitch-detection'
 
 @Injectable({ providedIn: 'root' })
 export class PitchDetectionService {
-  constructor() {
-    console.log('Creating pitch detection service')
-  }
-
   /**
    * Toggle on pitch detection.
    *

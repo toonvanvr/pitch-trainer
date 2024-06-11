@@ -20,15 +20,23 @@
             "outputPath": "dist/app",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@coderline/alphatab/dist/font",
+                "output": "assets/font"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@coderline/alphatab/dist/soundfont",
+                "output": "assets/soundfont"
               }
             ],
             "styles": [
@@ -79,16 +87,23 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@coderline/alphatab/dist/font",
+                "output": "assets/font"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@coderline/alphatab/dist/soundfont",
+                "output": "assets/soundfont"
               }
             ],
             "styles": [
