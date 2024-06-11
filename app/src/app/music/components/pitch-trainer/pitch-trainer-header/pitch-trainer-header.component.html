@@ -8,8 +8,8 @@
     <button mat-icon-button aria-label="Fast rewind">
       <mat-icon>fast_rewind</mat-icon>
     </button>
-    <button mat-icon-button aria-label="Play">
-      <mat-icon>play_arrow</mat-icon>
+    <button mat-icon-button aria-label="Play" (click)="playPause()">
+      <mat-icon>{{ (isPlaying$ | async) ? 'pause' : 'play_arrow' }}</mat-icon>
     </button>
     <button mat-icon-button aria-label="Fast forward">
       <mat-icon>fast_forward</mat-icon>

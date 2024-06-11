@@ -54,6 +54,7 @@ export class SheetMusicService {
   public readonly score$
   public readonly soundFontLoadStatus$
   public readonly tickCache$
+  public readonly playerState$
 
   constructor() {
     this.alphaTab = new AlphaTabApi(this.container, {
@@ -124,6 +125,16 @@ export class SheetMusicService {
       this.source$.pipe(() => of(null)),
       this.playerReady$.pipe(map(() => this.alphaTab.tickCache)),
     ).pipe(distinctUntilChanged())
+
+    this.playerState$ = merge(
+      this.initializing$.pipe(() => of(null)),
+      this.playerReady$.pipe(() => of(0)),
+      fromEventPattern(
+        (handler) => this.alphaTab?.playerStateChanged.on(handler),
+        (handler) => this.alphaTab?.playerStateChanged.off(handler),
+        () => this.alphaTab.playerState,
+      ),
+    )
 
     this.playedNotes$ = this.score$.pipe(
       map((score) => {
