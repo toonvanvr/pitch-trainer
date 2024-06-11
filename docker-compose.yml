@@ -1,11 +1,10 @@
 volumes:
-  node-modules-cache:
-    name: pitch-trainer-node-modules-cache
+  yarn-cache:
+    name: pitch-trainer-yarn-cache
   frontend-node-modules:
     name: pitch-trainer-frontend-node-modules
 
 services:
-
   # Angular 18 frontend
   # http://localhost:4200
   # TODO: don't run the container as root
@@ -14,8 +13,9 @@ services:
     build:
       dockerfile: ./docker/frontend.Dockerfile
     volumes:
-      - node-modules-cache:/root/.npm
+      - yarn-cache:/usr/local/share/.cache/yarn/v6
       - frontend-node-modules:/app/node_modules
       - ./app:/app
     ports:
       - 4200:4200
+    command: yarn run start -- --host 0.0.0.0
