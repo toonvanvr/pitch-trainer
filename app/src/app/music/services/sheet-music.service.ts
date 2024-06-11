@@ -27,7 +27,7 @@ export interface PlayedNote {
   frequency: number
   start: number
   end: number
-  get duration(): number
+  duration: number
 }
 
 @Injectable({
@@ -139,16 +139,13 @@ export class SheetMusicService {
               for (const voice of bar.voices) {
                 for (const beat of voice.beats) {
                   for (const note of beat.notes) {
+                    const duration = beat.displayDuration * note.durationPercent
                     playedNotes.push({
                       noteIndex: note.realValue,
                       frequency: noteIndexFrequencies[note.realValue],
-                      start: beat.absolutePlaybackStart,
-                      end:
-                        beat.absolutePlaybackStart +
-                        beat.duration * (note.durationPercent / 100),
-                      get duration() {
-                        return this.end - this.start
-                      },
+                      start: beat.absoluteDisplayStart,
+                      end: beat.absoluteDisplayStart + duration,
+                      duration,
                     })
                   }
                 }

@@ -1,22 +1,3 @@
-<ng-container *ngIf="(pitch$ | async) as pitch">
-  <div>
-    Pitch:
-    <div>frequency: {{ pitch.frequency}}</div>
-    <div>noteIndex: {{ pitch.noteIndex}}</div>
-    <div>noteName: {{ pitch.noteName}}</div>
-    <div>octave: {{ pitch.octave}}</div>
-    <div>cents: {{ pitch.cents}}</div>
-  </div>
-</ng-container>
-
-<ng-container *ngIf="(extrema$ | async) as extrema">
-  <div>
-    Extrema:
-    {{ extrema.minNote.noteIndex }} {{ extrema.minNote.frequency }}
-    {{ extrema.maxNote.noteIndex }} {{ extrema.maxNote.frequency }}
-  </div>
-</ng-container>
-
 <!-- <div>
   playerReady: {{ (playerReady$ | async)}}
 </div>
