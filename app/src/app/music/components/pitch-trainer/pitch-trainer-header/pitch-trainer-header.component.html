@@ -4,13 +4,13 @@
     <button mat-icon-button aria-label="Seek to start" (click)="seekToStart()">
       <mat-icon>first_page</mat-icon>
     </button>
-    <button mat-icon-button aria-label="Fast rewind">
+    <button mat-icon-button aria-label="Fast rewind" (click)="seekBackward()">
       <mat-icon>fast_rewind</mat-icon>
     </button>
     <button mat-icon-button aria-label="Play" (click)="playPause()">
       <mat-icon>{{ (isPlaying$ | async) ? 'pause' : 'play_arrow' }}</mat-icon>
     </button>
-    <button mat-icon-button aria-label="Fast forward">
+    <button mat-icon-button aria-label="Fast forward" (click)="seekForward()">
       <mat-icon>fast_forward</mat-icon>
     </button>
     <button mat-icon-button aria-label="Seek to end" (click)="seekToEnd()">

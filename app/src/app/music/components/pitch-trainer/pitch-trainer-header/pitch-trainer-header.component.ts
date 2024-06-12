@@ -26,6 +26,8 @@ export class PitchTrainerHeaderComponent {
   playPause = this.sheetMusic.playPause.bind(this.sheetMusic)
   seekToStart = this.sheetMusic.seekToStart.bind(this.sheetMusic)
   seekToEnd = this.sheetMusic.seekToEnd.bind(this.sheetMusic)
+  seekForward = this.sheetMusic.seekForward.bind(this.sheetMusic)
+  seekBackward = this.sheetMusic.seekBackward.bind(this.sheetMusic)
 
   readonly isPlaying$ = this.sheetMusic.playerState$.pipe(
     map((state) => state === 1),

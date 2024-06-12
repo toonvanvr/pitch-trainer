@@ -5,6 +5,7 @@ import {
   Subject,
   Subscription,
   distinctUntilChanged,
+  first,
   fromEventPattern,
   map,
   merge,
@@ -23,6 +24,9 @@ export type MasterBarTickLookup = MidiTickLookup['masterBars'][number]
 export type BeatTickLookup = Exclude<MasterBarTickLookup['firstBeat'], null>
 export type Beat = BeatTickLookup['highlightedBeats'][number]['beat']
 export type Note = Beat['notes'][number]
+export type ActiveBeatsChangedEvent = Parameters<
+  Parameters<AlphaTabApi['activeBeatsChanged']['on']>[0]
+>[0]
 
 export interface PlayedNote {
   noteIndex: number
@@ -57,6 +61,8 @@ export class SheetMusicService {
   public readonly soundFontLoadStatus$
   public readonly tickCache$
   public readonly playerState$
+  public readonly activeBeats$
+  public readonly tickPosition$
 
   constructor() {
     this.alphaTab = new AlphaTabApi(this.container, {
@@ -92,7 +98,7 @@ export class SheetMusicService {
           return { loaded: true, progress: 1 }
         },
       ),
-    )
+    ).pipe(shareReplay(1))
 
     this.playerReady$ = merge(
       this.initializing$.pipe(() => of(null)),
@@ -102,7 +108,7 @@ export class SheetMusicService {
         (handler) => this.alphaTab?.playerReady.off(handler),
         () => true,
       ),
-    )
+    ).pipe(distinctUntilChanged(), shareReplay(1))
 
     this.rendered$ = merge(
       this.initializing$.pipe(() => of(null)),
@@ -116,7 +122,7 @@ export class SheetMusicService {
         (handler) => this.alphaTab?.renderFinished.off(handler),
         () => true,
       ),
-    ).pipe(distinctUntilChanged())
+    ).pipe(distinctUntilChanged(), shareReplay(1))
 
     this.score$ = merge(
       this.initializing$.pipe(() => of(null)),
@@ -132,7 +138,7 @@ export class SheetMusicService {
       this.initializing$.pipe(() => of(null)),
       this.source$.pipe(() => of(null)),
       this.playerReady$.pipe(map(() => this.alphaTab.tickCache)),
-    ).pipe(distinctUntilChanged())
+    ).pipe(distinctUntilChanged(), shareReplay(1))
 
     this.playerState$ = merge(
       this.initializing$.pipe(() => of(null)),
@@ -142,15 +148,23 @@ export class SheetMusicService {
         (handler) => this.alphaTab?.playerStateChanged.off(handler),
         () => this.alphaTab.playerState,
       ),
-    )
+    ).pipe(shareReplay(1))
+
+    this.activeBeats$ = merge(
+      this.initializing$.pipe(() => of(null)),
+      this.playerReady$.pipe(() => of(null)),
+      fromEventPattern(
+        (handler) => this.alphaTab?.activeBeatsChanged.on(handler),
+        (handler) => this.alphaTab?.activeBeatsChanged.off(handler),
+        (e: ActiveBeatsChangedEvent) => e.activeBeats,
+      ),
+    ).pipe(shareReplay(1))
 
     this.playedNotes$ = this.score$.pipe(
       map((score) => {
         if (!score) {
-          console.log('NO SCORE')
           return null
         }
-        console.log('HAVE SCORE')
 
         const playedNotes: PlayedNote[] = []
 
@@ -221,7 +235,6 @@ export class SheetMusicService {
     // this.alphaTab.playedBeatChanged
     // this.alphaTab.playerFinished
     // this.alphaTab.playerPositionChanged
-    // this.alphaTab.playerStateChanged
     // this.alphaTab.resize
     // this.alphaTab.settingsUpdated
 
@@ -241,7 +254,7 @@ export class SheetMusicService {
   }
 
   seekToEnd() {
-    this.playedNotes$.forEach((playedNotes) => {
+    this.playedNotes$.pipe(first()).forEach((playedNotes) => {
       if (playedNotes) {
         const lastNote = playedNotes[playedNotes.length - 1]
         if (lastNote) {
@@ -249,5 +262,37 @@ export class SheetMusicService {
         }
       }
     })
+  }
+
+  seekForward() {
+    const tickCache = this.alphaTab.tickCache
+    if (!tickCache) {
+      console.log('no tick cache')
+      return
+    }
+
+    const result = tickCache.findBeat(new Set([0]), this.alphaTab.tickPosition)
+    if (result) {
+      const nextMasterBar = result.masterBar.nextMasterBar
+      if (nextMasterBar) {
+        this.alphaTab.tickPosition = nextMasterBar.start
+      }
+    }
+  }
+
+  seekBackward() {
+    const tickCache = this.alphaTab.tickCache
+    if (!tickCache) {
+      console.log('no tick cache')
+      return
+    }
+
+    const result = tickCache.findBeat(new Set([0]), this.alphaTab.tickPosition)
+    if (result) {
+      const previousMasterBar = result.masterBar.previousMasterBar
+      if (previousMasterBar) {
+        this.alphaTab.tickPosition = previousMasterBar.start
+      }
+    }
   }
 }
