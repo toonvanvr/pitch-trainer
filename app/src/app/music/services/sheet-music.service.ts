@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core'
 import { AlphaTabApi, ProgressEventArgs } from '@coderline/alphatab'
 import {
+  BehaviorSubject,
   Subject,
   Subscription,
+  combineLatest,
   distinctUntilChanged,
   first,
   fromEventPattern,
@@ -37,6 +39,10 @@ export class SheetMusicService {
   public readonly container = document.createElement('div')
   public alphaTab: AlphaTabApi
 
+  public readonly metronomeVolume$ = new BehaviorSubject(1)
+  public readonly masterVolume$ = new BehaviorSubject(1)
+  public readonly transpose$ = new BehaviorSubject(0)
+
   public readonly extrema$
   public readonly sheetNotes$
   public readonly playerReady$
@@ -62,6 +68,9 @@ export class SheetMusicService {
         outputMode: 1, // legacy mode
       },
     } satisfies AlphaTabApiOptions)
+    this.metronomeVolume$.next(this.alphaTab.metronomeVolume)
+    this.masterVolume$.next(this.alphaTab.masterVolume)
+
     // @ts-ignore
     globalThis.alphatab = this.alphaTab
 
@@ -163,9 +172,12 @@ export class SheetMusicService {
       ),
     ).pipe(shareReplay(1))
 
-    this.sheetNotes$ = this.tickCache$
+    this.sheetNotes$ = combineLatest({
+      cache: this.tickCache$,
+      transposition: this.transpose$.pipe(distinctUntilChanged()),
+    })
       .pipe(
-        map((cache) => {
+        map(({ cache, transposition }) => {
           if (!cache) {
             return null
           }
@@ -183,6 +195,7 @@ export class SheetMusicService {
                       beatTickLookup,
                       beatTickLookupItem,
                       beat,
+                      transposition: 0,
                     }),
                   )
                 }
@@ -238,6 +251,33 @@ export class SheetMusicService {
     this.subscriptions.add(
       this.source$.subscribe((arrayBuffer) => {
         this.alphaTab?.load(arrayBuffer)
+      }),
+    )
+
+    this.subscriptions.add(
+      this.metronomeVolume$.pipe(distinctUntilChanged()).subscribe((volume) => {
+        this.alphaTab.metronomeVolume = volume
+        this.metronomeVolume$.next(this.alphaTab.metronomeVolume)
+      }),
+    )
+
+    this.subscriptions.add(
+      this.masterVolume$.pipe(distinctUntilChanged()).subscribe((volume) => {
+        this.alphaTab.masterVolume = volume
+        this.masterVolume$.next(volume)
+      }),
+    )
+
+    this.subscriptions.add(
+      this.transpose$.pipe(distinctUntilChanged()).subscribe((transpose) => {
+        this.alphaTab.settings.notation.transpositionPitches = [transpose]
+        // this.alphaTab.settings.notation.displayTranspositionPitches = [
+        //   transpose,
+        // ]
+        this.alphaTab.updateSettings()
+        this.transpose$.next(
+          this.alphaTab.settings.notation.transpositionPitches[0],
+        )
       }),
     )
   }

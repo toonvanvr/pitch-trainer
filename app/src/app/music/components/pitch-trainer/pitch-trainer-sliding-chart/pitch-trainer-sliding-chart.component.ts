@@ -5,6 +5,7 @@ import {
   combineLatest,
   distinctUntilChanged,
   map,
+  pairwise,
   shareReplay,
 } from 'rxjs'
 import { PitchDetectionService } from '../../../services/pitch-detection.service'
@@ -53,7 +54,7 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
       const totalHeight = range * scaleY
       const totalWidth = end
       const svg = SVG()
-        .size(1000, totalHeight)
+        .size(3000, totalHeight)
         .viewbox(0, 0, totalWidth, totalHeight)
         .attr('preserveAspectRatio', 'none')
       for (let i = 0; i < maxIndex - minIndex + 2; i++) {
@@ -93,7 +94,12 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
         noteBars.push(noteBar)
       }
 
-      return { svg, noteBars, tickLine }
+      const pitchBar = svg
+        .rect(totalWidth, scaleY)
+        .fill('rgba(0,0,0,.1)')
+        .hide()
+
+      return { svg, noteBars, tickLine, pitchBar }
     }),
     distinctUntilChanged(),
     shareReplay(1),
@@ -102,6 +108,14 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
   tickLine: Line | null = null
   raceChart: HTMLElement | null = null
   ngAfterViewInit() {
+    this.subscriptions.add(
+      this.svgData$.pipe(pairwise()).subscribe(([prev, curr]) => {
+        if (prev) {
+          prev.svg.remove()
+        }
+      }),
+    )
+
     this.subscriptions.add(
       this.svgData$.subscribe((svgData) => {
         if (svgData) {
@@ -130,25 +144,46 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
 
     this.subscriptions.add(
       combineLatest({
-        pitch: this.pitch$,
+        extrema: this.sheetMusic.extrema$,
         svgData: this.svgData$,
-        tickPosition: this.sheetMusic.tickPosition$,
-      }).subscribe(({ pitch, svgData, tickPosition }) => {
-        // if (svgData && tickPosition) {
-        //   const { svg, noteBars } = svgData
-        //   const { noteIndex, octave } = pitch
-        //   const noteBar = noteBars.find(
-        //     (noteBar) => noteBar.y() === (127 - noteIndex) * 10,
-        //   )
-        //   if (noteBar) {
-        //     noteBar.fill(noteColor(noteIndex, octave))
-        //   }
-        //   svg
-        //     .circle(5)
-        //     .move(tickPosition.currentTick, (127 - noteIndex) * 10)
-        //     .fill('#f00')
-        // }
+        pitch: this.pitch$,
+      }).subscribe(({ svgData, pitch, extrema }) => {
+        if (svgData && extrema) {
+          const { pitchBar } = svgData
+          if (!pitch) {
+            pitchBar.hide()
+          } else {
+            pitchBar
+              .attr({ y: (extrema.max.note.index - pitch.note.index) * 10 })
+              .show()
+          }
+        }
       }),
     )
+
+    // this.subscriptions.add(
+    //   combineLatest({
+    //     pitch: this.pitch$,
+    //     extrema: this.sheetMusic.extrema$,
+    //     svgData: this.svgData$,
+    //     tickPosition: this.sheetMusic.tickPosition$,
+    //   }).subscribe(({ pitch, svgData, tickPosition, extrema }) => {
+    //     if (svgData && tickPosition && pitch && extrema) {
+    //       const { svg, noteBars } = svgData
+    //       const {
+    //         note: { index, octave },
+    //       } = pitch
+    //       // if (noteBar) {
+    //       //   noteBar.fill(noteColor(index))
+    //       // }
+    //       const radius = 10
+    //       const x = 1000
+    //       const y = (extrema.max.note.index - index) * 10
+    //       const color = '#f00'
+    //       svg.circle(radius).move(x, y).fill(color)
+    //       console.log('add svg', svg, { x, y, radius, color })
+    //     }
+    //   }),
+    // )
   }
 }

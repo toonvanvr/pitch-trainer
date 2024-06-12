@@ -37,10 +37,10 @@ export class PitchDetectionService {
       if (!enabled) {
         return false
       } else {
-        console.warn('PitchDetectionService.initPitchDetection()')
         return await initPitchDetection()
       }
     }),
+    share(),
   )
 
   /** Pitch frequency at max rate for this library */

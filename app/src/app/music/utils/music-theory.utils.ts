@@ -28,7 +28,7 @@ export function noteColor(index: number): string {
   // hue range centra go from 180 degrees to 300 degrees (lightblue to pink)
   const octaveHueStep = (300 - 180) / 12
   // the note index within the scale has less impact on the coloring
-  const noteHueRange = octaveHueStep / 6
+  const noteHueRange = octaveHueStep / 4
   const noteHueStep = noteHueRange / 12
   const innerOctaveIndex = index % 12
 
@@ -38,5 +38,5 @@ export function noteColor(index: number): string {
     innerOctaveIndex * noteHueStep -
     noteHueRange / 2
 
-  return `hsla(${hue}, 100%, 50%, 75%)`
+  return `hsla(${hue}, 100%, 50%, 55%)`
 }
