@@ -1,29 +1,43 @@
 import { Injectable } from '@angular/core'
-import { BehaviorSubject, Observable, of, switchMap } from 'rxjs'
+import {
+  BehaviorSubject,
+  Observable,
+  distinctUntilChanged,
+  of,
+  share,
+  switchMap,
+} from 'rxjs'
 import { onUnsubscribe } from '../../core/utils/rxjs/operators/on-unsubscribe'
 import { Pitch } from '../model/pitch.class'
 import { initPitchDetection } from '../utils/ml5.utils'
 
 @Injectable({ providedIn: 'root' })
 export class PitchDetectionService {
+  constructor() {
+    console.warn('new PitchDetectionService()')
+  }
+
   /**
    * Toggle on pitch detection from microphone input
    *
    * User input is required in browsers to enable audio capture, so attach this
    * to a user event like a button click.
    */
-  readonly #isEnabled$ = new BehaviorSubject<boolean>(false)
-  public readonly isEnabled$ = this.#isEnabled$.asObservable()
+  readonly #isEnabled$ = new BehaviorSubject(false)
+  public readonly isEnabled$ = this.#isEnabled$
+    .asObservable()
+    .pipe(distinctUntilChanged(), share())
   public togglePitchDetection(enabled?: boolean): void {
     this.#isEnabled$.next(enabled ?? !this.#isEnabled$.value)
   }
 
   /** Pitch detector - null if disabled or error */
-  private readonly pitchDetection$ = this.#isEnabled$.pipe(
+  private readonly pitchDetection$ = this.isEnabled$.pipe(
     switchMap(async (enabled) => {
       if (!enabled) {
         return false
       } else {
+        console.warn('PitchDetectionService.initPitchDetection()')
         return await initPitchDetection()
       }
     }),
@@ -56,7 +70,10 @@ export class PitchDetectionService {
           }
         }
         getPitchWhileListening()
-      }).pipe(onUnsubscribe(() => (listening = false)))
+      }).pipe(
+        onUnsubscribe(() => (listening = false)),
+        share(),
+      )
     }),
   )
 }
