@@ -32,7 +32,7 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
   pitch$ = this.pitchDetection.pitch$
 
   svgData$ = combineLatest({
-    notes: this.sheetMusic.playedNotes$,
+    notes: this.sheetMusic.sheetNotes,
     extrema: this.sheetMusic.extrema$,
   }).pipe(
     map(({ notes, extrema }) => {

@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject, Observable, of, switchMap } from 'rxjs'
 import { onUnsubscribe } from '../../core/utils/rxjs/operators/on-unsubscribe'
+import { Pitch } from '../model/pitch.class'
 import { initPitchDetection } from '../utils/ml5.utils'
-import { noteIndexFor, noteIndexNames } from '../utils/music-theory.utils'
-import { Pitch } from './pitch-detection.types'
 
 @Injectable({ providedIn: 'root' })
 export class PitchDetectionService {
@@ -47,15 +46,7 @@ export class PitchDetectionService {
                 if (frequency === null) {
                   subscriber.next(null)
                 } else {
-                  const noteIndex = noteIndexFor(frequency)
-                  const noteIndexRounded = Math.round(noteIndex)
-                  subscriber.next({
-                    frequency,
-                    noteIndex: noteIndexRounded,
-                    noteName: noteIndexNames[noteIndexRounded],
-                    octave: Math.floor(noteIndex / 12),
-                    cents: Math.floor((noteIndex - noteIndexRounded) * 100),
-                  })
+                  subscriber.next(new Pitch(frequency))
                 }
                 getPitchWhileListening()
               }

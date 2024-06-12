@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core'
 import { AlphaTabApi, ProgressEventArgs } from '@coderline/alphatab'
 import {
-  Observable,
   Subject,
   Subscription,
   distinctUntilChanged,
@@ -12,33 +11,14 @@ import {
   of,
   shareReplay,
 } from 'rxjs'
-import { AlphaTabApiOptions } from '../../core/types/alphatab.module'
-import { noteIndexFrequency } from '../utils/music-theory.utils'
-
-export type Score = Exclude<AlphaTabApi['score'], null>
-export type MidiTickLookup = Exclude<
-  SheetMusicService['tickCache$'] extends Observable<infer T> ? T : never,
-  null
->
-export type MasterBarTickLookup = MidiTickLookup['masterBars'][number]
-export type BeatTickLookup = Exclude<MasterBarTickLookup['firstBeat'], null>
-export type Beat = BeatTickLookup['highlightedBeats'][number]['beat']
-export type Note = Beat['notes'][number]
-export type ActiveBeatsChangedEvent = Parameters<
-  Parameters<AlphaTabApi['activeBeatsChanged']['on']>[0]
->[0]
-export type PositionChangedEventArgs = Parameters<
-  Parameters<AlphaTabApi['playerPositionChanged']['on']>[0]
->[0]
-
-export interface PlayedNote {
-  noteIndex: number
-  octave: number
-  frequency: number
-  start: number
-  end: number
-  duration: number
-}
+import {
+  ActiveBeatsChangedEvent,
+  AlphaTabApiOptions,
+  PositionChangedEventArgs,
+  Score,
+} from '../../core/types/alphatab.module'
+import { SheetNote } from '../model/sheet-note.class'
+import { masterBarBeats } from '../utils/alphatab.utils'
 
 @Injectable({
   providedIn: 'root',
@@ -58,13 +38,13 @@ export class SheetMusicService {
   public alphaTab: AlphaTabApi
 
   public readonly extrema$
-  public readonly playedNotes$
+  public readonly sheetNotes$
   public readonly playerReady$
   public readonly rendered$
   public readonly score$
   public readonly soundFontLoadStatus$
   public readonly tickCache$
-  public readonly playerState$
+  public readonly isPlaying$
   public readonly activeBeats$
   public readonly tickPosition$
 
@@ -74,14 +54,11 @@ export class SheetMusicService {
       player: {
         enablePlayer: true,
         soundFont: '/assets/alphatab/soundfont/sonivox.sf2',
-        outputMode: 1,
+        outputMode: 1, // legacy mode
       },
     } satisfies AlphaTabApiOptions)
-
     // @ts-ignore
     globalThis.alphatab = this.alphaTab
-    // @ts-ignore
-    globalThis.api = this.alphaTab
 
     this.soundFontLoadStatus$ = merge(
       this.initializing$.pipe(() => of({ loaded: false, progress: 0 })),
@@ -144,13 +121,13 @@ export class SheetMusicService {
       this.playerReady$.pipe(map(() => this.alphaTab.tickCache)),
     ).pipe(distinctUntilChanged(), shareReplay(1))
 
-    this.playerState$ = merge(
+    this.isPlaying$ = merge(
       this.initializing$.pipe(() => of(null)),
       this.playerReady$.pipe(() => of(0)),
       fromEventPattern(
         (handler) => this.alphaTab?.playerStateChanged.on(handler),
         (handler) => this.alphaTab?.playerStateChanged.off(handler),
-        () => this.alphaTab.playerState,
+        () => (this.alphaTab.playerState === 1 ? true : false),
       ),
     ).pipe(shareReplay(1))
 
@@ -172,71 +149,55 @@ export class SheetMusicService {
       ),
     ).pipe(shareReplay(1))
 
-    this.playedNotes$ = this.score$.pipe(
-      map((score) => {
-        if (!score) {
-          return null
-        }
+    this.sheetNotes$ = this.tickCache$
+      .pipe(
+        map((cache) => {
+          if (!cache) {
+            return null
+          }
 
-        const playedNotes: PlayedNote[] = []
-
-        for (const track of score.tracks) {
-          for (const staff of track.staves) {
-            for (const bar of staff.bars) {
-              for (const voice of bar.voices) {
-                for (const beat of voice.beats) {
-                  for (const note of beat.notes) {
-                    const duration = beat.displayDuration * note.durationPercent
-                    playedNotes.push({
-                      noteIndex: note.realValue,
-                      octave: note.octave,
-                      frequency: noteIndexFrequency[note.realValue],
-                      start: beat.absoluteDisplayStart,
-                      end: beat.absoluteDisplayStart + duration,
-                      duration,
-                    })
-                  }
+          const sheetNotes: SheetNote[] = []
+          for (const masterBarTickLookup of cache.masterBars) {
+            for (const beatTickLookup of masterBarBeats(masterBarTickLookup)) {
+              for (const beatTickLookupItem of beatTickLookup.highlightedBeats) {
+                const beat = beatTickLookupItem.beat
+                for (const note of beat.notes) {
+                  sheetNotes.push(
+                    new SheetNote({
+                      note,
+                      masterBarTickLookup,
+                      beatTickLookup,
+                      beatTickLookupItem,
+                      beat,
+                    }),
+                  )
                 }
               }
             }
           }
-        }
 
-        return playedNotes
-      }),
-    )
+          return sheetNotes
+        }),
+      )
+      .pipe(shareReplay(1))
 
-    this.extrema$ = this.playedNotes$.pipe(
-      map((sounds) => {
-        if (!sounds) {
+    this.extrema$ = this.sheetNotes$.pipe(
+      map((sheetNotes) => {
+        if (!sheetNotes || !sheetNotes.length) {
           return null
         }
 
-        let minIndex = Infinity
-        let maxIndex = -Infinity
-        let minNoteIndex
-        let maxNoteIndex
-        for (const sound of sounds) {
-          if (sound.noteIndex < minIndex) {
-            minIndex = sound.noteIndex
-            minNoteIndex = sound
-          }
-          if (sound.noteIndex > maxIndex) {
-            maxIndex = sound.noteIndex
-            maxNoteIndex = sound
+        let min = sheetNotes[0]
+        let max = sheetNotes[0]
+        for (const sheetNote of sheetNotes.slice(1)) {
+          if (sheetNote.note.index < min.note.index) {
+            min = sheetNote
+          } else if (sheetNote.note.index > max.note.index) {
+            max = sheetNote
           }
         }
 
-        if (!minNoteIndex || !maxNoteIndex) {
-          return null
-        }
-
-        return {
-          minNoteIndex: minIndex,
-          maxNoteIndex: maxIndex,
-          minNote: minNoteIndex,
-          maxNote: maxNoteIndex,
-        }
+        return { min, max }
       }),
     )
 
@@ -267,9 +228,9 @@ export class SheetMusicService {
   }
 
   seekToEnd() {
-    this.playedNotes$.pipe(first()).forEach((playedNotes) => {
-      if (playedNotes) {
-        const lastNote = playedNotes[playedNotes.length - 1]
+    this.sheetNotes$.pipe(first()).forEach((sheetNotes) => {
+      if (sheetNotes) {
+        const lastNote = sheetNotes[sheetNotes.length - 1]
         if (lastNote) {
           this.alphaTab.tickPosition = lastNote.start
         }
@@ -280,7 +241,6 @@ export class SheetMusicService {
   seekForward() {
     const tickCache = this.alphaTab.tickCache
     if (!tickCache) {
-      console.log('no tick cache')
       return
     }
 
@@ -296,7 +256,6 @@ export class SheetMusicService {
   seekBackward() {
     const tickCache = this.alphaTab.tickCache
     if (!tickCache) {
-      console.log('no tick cache')
       return
     }
 

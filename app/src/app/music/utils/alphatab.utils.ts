@@ -1,7 +1,7 @@
 import {
   BeatTickLookup,
   MasterBarTickLookup,
-} from '../services/sheet-music.service'
+} from '../../core/types/alphatab.module'
 
 export function masterBarBeats(
   masterBarTickLookup: MasterBarTickLookup,

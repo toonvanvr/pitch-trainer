@@ -29,7 +29,7 @@ export class PitchTrainerHeaderComponent {
   seekForward = this.sheetMusic.seekForward.bind(this.sheetMusic)
   seekBackward = this.sheetMusic.seekBackward.bind(this.sheetMusic)
 
-  readonly isPlaying$ = this.sheetMusic.playerState$.pipe(
+  readonly isPlaying$ = this.sheetMusic.isPlaying$.pipe(
     map((state) => state === 1),
   )
 }

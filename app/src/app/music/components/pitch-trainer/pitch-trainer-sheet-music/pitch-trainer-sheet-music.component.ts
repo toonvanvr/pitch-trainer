@@ -39,7 +39,7 @@ export class PitchTrainerSheetMusicComponent {
   soundFontLoadStatus$ = this.sheetMusic.soundFontLoadStatus$
   tickCache$ = this.sheetMusic.tickCache$
   extrema$ = this.sheetMusic.extrema$
-  sounds$ = this.sheetMusic.playedNotes$
+  sounds$ = this.sheetMusic.sheetNotes
   pitch$ = this.pitchDetection.pitch$
 
   masterBarBeats = masterBarBeats
