@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core'
-import { Line, Rect, SVG } from '@svgdotjs/svg.js'
+import { Rect, SVG } from '@svgdotjs/svg.js'
 import {
   Subscription,
   combineLatest,
@@ -54,7 +54,7 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
       const totalHeight = range * scaleY
       const totalWidth = end
       const svg = SVG()
-        .size(3000, totalHeight)
+        .size(Math.min(screen.width * 5, 6000), totalHeight)
         .viewbox(0, 0, totalWidth, totalHeight)
         .attr('preserveAspectRatio', 'none')
       for (let i = 0; i < maxIndex - minIndex + 2; i++) {
@@ -105,7 +105,6 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
     shareReplay(1),
   )
 
-  tickLine: Line | null = null
   raceChart: HTMLElement | null = null
   ngAfterViewInit() {
     this.subscriptions.add(
@@ -122,7 +121,6 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
           const raceChart = document.getElementById('race-chart')
           if (raceChart) {
             svgData.svg.addTo(raceChart)
-            this.tickLine = svgData.tickLine
             this.raceChart = raceChart
           } else {
             throw new Error(
@@ -134,10 +132,18 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
     )
 
     this.subscriptions.add(
-      this.sheetMusic.tickPosition$.subscribe((tick) => {
-        if (this.tickLine && this.raceChart) {
-          this.tickLine.move(tick?.currentTick ?? 0, 0)
-          this.raceChart.scrollTo((tick?.currentTick ?? 0) - 100, 0)
+      combineLatest({
+        svgData: this.svgData$,
+        tickPosition: this.sheetMusic.tickPosition$,
+      }).subscribe(({ svgData, tickPosition }) => {
+        if (svgData && this.raceChart && tickPosition) {
+          const { tickLine } = svgData
+          tickLine.move(tickPosition.currentTick, 0)
+          tickLine.node.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'center',
+          })
         }
       }),
     )
