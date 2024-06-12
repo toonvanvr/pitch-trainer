@@ -26,8 +26,11 @@ export class PitchTrainerSheetMusicComponent {
     } else {
       throw new Error('Element #sheet-music is required for this app to work')
     }
+    this.sheetMusic.alphaTab.updateSettings()
     const examFileUrl = new URL('/scores/examen-zang.tex', window.location.href)
     this.sheetMusic.loadFile(examFileUrl)
+    this.sheetMusic.alphaTab.updateSettings()
+    this.sheetMusic.alphaTab.render()
   }
 
   playerReady$ = this.sheetMusic.playerReady$

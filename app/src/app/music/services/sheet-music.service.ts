@@ -9,7 +9,9 @@ import {
   map,
   merge,
   of,
+  shareReplay,
 } from 'rxjs'
+import { AlphaTabApiOptions } from '../../core/types/alphatab.module'
 import { noteIndexFrequencies } from '../utils/music-theory.utils'
 
 export type Score = Exclude<AlphaTabApi['score'], null>
@@ -62,8 +64,14 @@ export class SheetMusicService {
       player: {
         enablePlayer: true,
         soundFont: '/assets/alphatab/soundfont/sonivox.sf2',
+        outputMode: 1,
       },
-    })
+    } satisfies AlphaTabApiOptions)
+
+    // @ts-ignore
+    globalThis.alphatab = this.alphaTab
+    // @ts-ignore
+    globalThis.api = this.alphaTab
 
     this.soundFontLoadStatus$ = merge(
       this.initializing$.pipe(() => of({ loaded: false, progress: 0 })),
@@ -118,7 +126,7 @@ export class SheetMusicService {
         (handler) => this.alphaTab?.scoreLoaded.off(handler),
         () => this.alphaTab.score as Score,
       ),
-    ).pipe(distinctUntilChanged())
+    ).pipe(distinctUntilChanged(), shareReplay(1))
 
     this.tickCache$ = merge(
       this.initializing$.pipe(() => of(null)),
@@ -139,8 +147,10 @@ export class SheetMusicService {
     this.playedNotes$ = this.score$.pipe(
       map((score) => {
         if (!score) {
+          console.log('NO SCORE')
           return null
         }
+        console.log('HAVE SCORE')
 
         const playedNotes: PlayedNote[] = []
 
@@ -220,5 +230,24 @@ export class SheetMusicService {
         this.alphaTab?.load(arrayBuffer)
       }),
     )
+  }
+
+  playPause() {
+    this.alphaTab.playPause()
+  }
+
+  seekToStart() {
+    this.alphaTab.tickPosition = 0
+  }
+
+  seekToEnd() {
+    this.playedNotes$.forEach((playedNotes) => {
+      if (playedNotes) {
+        const lastNote = playedNotes[playedNotes.length - 1]
+        if (lastNote) {
+          this.alphaTab.tickPosition = lastNote.start
+        }
+      }
+    })
   }
 }
