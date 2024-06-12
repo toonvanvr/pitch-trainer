@@ -13,7 +13,7 @@ import {
   shareReplay,
 } from 'rxjs'
 import { AlphaTabApiOptions } from '../../core/types/alphatab.module'
-import { noteIndexFrequencies } from '../utils/music-theory.utils'
+import { noteIndexFrequency } from '../utils/music-theory.utils'
 
 export type Score = Exclude<AlphaTabApi['score'], null>
 export type MidiTickLookup = Exclude<
@@ -27,9 +27,13 @@ export type Note = Beat['notes'][number]
 export type ActiveBeatsChangedEvent = Parameters<
   Parameters<AlphaTabApi['activeBeatsChanged']['on']>[0]
 >[0]
+export type PositionChangedEventArgs = Parameters<
+  Parameters<AlphaTabApi['playerPositionChanged']['on']>[0]
+>[0]
 
 export interface PlayedNote {
   noteIndex: number
+  octave: number
   frequency: number
   start: number
   end: number
@@ -160,6 +164,14 @@ export class SheetMusicService {
       ),
     ).pipe(shareReplay(1))
 
+    this.tickPosition$ = merge(
+      this.initializing$.pipe(() => of(null)),
+      fromEventPattern<PositionChangedEventArgs>(
+        (handler) => this.alphaTab?.playerPositionChanged.on(handler),
+        (handler) => this.alphaTab?.playerPositionChanged.off(handler),
+      ),
+    ).pipe(shareReplay(1))
+
     this.playedNotes$ = this.score$.pipe(
       map((score) => {
         if (!score) {
@@ -177,7 +189,8 @@ export class SheetMusicService {
                     const duration = beat.displayDuration * note.durationPercent
                     playedNotes.push({
                       noteIndex: note.realValue,
-                      frequency: noteIndexFrequencies[note.realValue],
+                      octave: note.octave,
+                      frequency: noteIndexFrequency[note.realValue],
                       start: beat.absoluteDisplayStart,
                       end: beat.absoluteDisplayStart + duration,
                       duration,

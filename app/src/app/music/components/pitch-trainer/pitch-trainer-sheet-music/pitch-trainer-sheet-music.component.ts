@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon'
 import { PitchDetectionService } from '../../../services/pitch-detection.service'
 import { SheetMusicService } from '../../../services/sheet-music.service'
 import { masterBarBeats } from '../../../utils/alphatab.utils'
-import { noteIndexFrequencies } from '../../../utils/music-theory.utils'
+import { noteIndexFrequency } from '../../../utils/music-theory.utils'
 
 @Component({
   selector: 'app-pitch-trainer-sheet-music',
@@ -43,5 +43,5 @@ export class PitchTrainerSheetMusicComponent {
   pitch$ = this.pitchDetection.pitch$
 
   masterBarBeats = masterBarBeats
-  noteIndexFrequencies = noteIndexFrequencies
+  noteIndexFrequencies = noteIndexFrequency
 }

@@ -1,4 +1,4 @@
-export const noteIndexFrequencies: number[] = Array.from({ length: 128 }).map(
+export const noteIndexFrequency: number[] = Array.from({ length: 128 }).map(
   (_, i) => Math.pow(2, (i - 69) / 12) * 440,
 )
 
@@ -21,7 +21,7 @@ const noteNames = [
   'si',
 ]
 
-export const noteIndexNames = noteIndexFrequencies.map((f, i) => {
+export const noteIndexNames = noteIndexFrequency.map((f, i) => {
   const name = noteNames[i % 12]
   const octave = Math.floor(i / 12)
   return `${name}${octave}`
