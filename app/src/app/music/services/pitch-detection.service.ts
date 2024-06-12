@@ -12,14 +12,14 @@ export class PitchDetectionService {
    * User input is required in browsers to enable audio capture, so attach this
    * to a user event like a button click.
    */
-  readonly #enabled$ = new BehaviorSubject<boolean>(false)
-  public readonly enabled$ = this.#enabled$.asObservable()
+  readonly #isEnabled$ = new BehaviorSubject<boolean>(false)
+  public readonly isEnabled$ = this.#isEnabled$.asObservable()
   public togglePitchDetection(enabled?: boolean): void {
-    this.#enabled$.next(enabled ?? !this.#enabled$.value)
+    this.#isEnabled$.next(enabled ?? !this.#isEnabled$.value)
   }
 
   /** Pitch detector - null if disabled or error */
-  private readonly pitchDetection$ = this.#enabled$.pipe(
+  private readonly pitchDetection$ = this.#isEnabled$.pipe(
     switchMap(async (enabled) => {
       if (!enabled) {
         return false

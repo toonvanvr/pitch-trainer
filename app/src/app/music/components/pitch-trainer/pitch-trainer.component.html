@@ -1,5 +1,7 @@
 <div class="layout flex flex-row h-screen">
-  <app-pitch-detection-scale></app-pitch-detection-scale>
+  <app-pitch-detection-scale
+    *ngIf="pitchDetectionIsEnabled$ | async"
+  ></app-pitch-detection-scale>
   <div class="content grow flex flex-col w-0">
     <app-pitch-trainer-header></app-pitch-trainer-header>
     <app-pitch-trainer-sliding-chart></app-pitch-trainer-sliding-chart>

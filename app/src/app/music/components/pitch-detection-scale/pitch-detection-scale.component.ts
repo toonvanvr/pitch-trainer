@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
-import { combineLatest, map } from 'rxjs'
+import { map } from 'rxjs'
 import { PitchDetectionService } from '../../services/pitch-detection.service'
 import { SheetMusicService } from '../../services/sheet-music.service'
-import { noteColor, noteIndexNames } from '../../utils/music-theory.utils'
+import { allNoteIndices, notesByIndex } from '../../utils/music-theory.utils'
 
 @Component({
   selector: 'app-pitch-detection-scale',
@@ -13,47 +13,25 @@ import { noteColor, noteIndexNames } from '../../utils/music-theory.utils'
   styleUrl: './pitch-detection-scale.component.scss',
 })
 export class PitchDetectionScaleComponent {
+  static readonly buffer = 6
+
   constructor(
     private readonly pitchDetection: PitchDetectionService,
     private readonly sheetMusic: SheetMusicService,
   ) {}
 
-  readonly scale$ = combineLatest({
-    extrema: this.sheetMusic.extrema$,
-    pitch: this.pitchDetection.pitch$,
-  }).pipe(
-    // TODO: this is too much math; handle extrema first and pitch in a separate pipe
-    map(({ extrema, pitch }) => {
+  readonly scale$ = this.sheetMusic.extrema$.pipe(
+    map((extrema) => {
       if (!extrema) {
-        return Array.from({ length: 128 })
-          .map((_, i) => {
-            return {
-              noteIndex: i,
-              noteOctave: Math.floor(i / 12),
-              noteName: noteIndexNames[i],
-              isSinging: pitch?.noteIndex === i,
-              cents: pitch?.noteIndex === i ? pitch?.cents : null,
-              bgColor: noteColor(i),
-            }
-          })
-          .reverse()
+        return allNoteIndices.map((index) => notesByIndex[index]).reverse()
       } else {
-        const buffer = 6
-        const minIndex = Math.max(0, extrema.minNoteIndex - buffer)
-        const maxIndex = Math.min(127, extrema.maxNoteIndex + buffer)
-        return Array.from({ length: maxIndex - minIndex + 1 })
-          .map((_, i) => {
-            const noteIndex = minIndex + i
-            return {
-              noteIndex,
-              noteOctave: Math.floor(noteIndex / 12),
-              noteName: noteIndexNames[noteIndex],
-              isSinging: pitch?.noteIndex === noteIndex,
-              cents: pitch?.noteIndex === noteIndex ? pitch?.cents : null,
-              bgColor: noteColor(i),
-            }
-          })
-          .reverse()
+        const buffer = PitchDetectionScaleComponent.buffer
+        const minIndex = Math.max(0, extrema.min.note.index - buffer)
+        const maxIndex = Math.min(127, extrema.max.note.index + buffer)
+        const indexRange = maxIndex - minIndex + 1
+        return Array.from({ length: indexRange }).map(
+          (_, i) => notesByIndex[minIndex + i],
+        )
       }
     }),
   )

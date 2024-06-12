@@ -4,7 +4,6 @@ import { MatButtonModule } from '@angular/material/button'
 import { MatDividerModule } from '@angular/material/divider'
 import { MatIconModule } from '@angular/material/icon'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
-import { map } from 'rxjs'
 import { SheetMusicService } from '../../../services/sheet-music.service'
 
 @Component({
@@ -23,13 +22,11 @@ import { SheetMusicService } from '../../../services/sheet-music.service'
 export class PitchTrainerHeaderComponent {
   constructor(private readonly sheetMusic: SheetMusicService) {}
 
-  playPause = this.sheetMusic.playPause.bind(this.sheetMusic)
-  seekToStart = this.sheetMusic.seekToStart.bind(this.sheetMusic)
-  seekToEnd = this.sheetMusic.seekToEnd.bind(this.sheetMusic)
-  seekForward = this.sheetMusic.seekForward.bind(this.sheetMusic)
-  seekBackward = this.sheetMusic.seekBackward.bind(this.sheetMusic)
+  readonly isPlaying$ = this.sheetMusic.isPlaying$
 
-  readonly isPlaying$ = this.sheetMusic.isPlaying$.pipe(
-    map((state) => state === 1),
-  )
+  readonly playPause = this.sheetMusic.playPause.bind(this.sheetMusic)
+  readonly seekToStart = this.sheetMusic.seekToStart.bind(this.sheetMusic)
+  readonly seekToEnd = this.sheetMusic.seekToEnd.bind(this.sheetMusic)
+  readonly seekForward = this.sheetMusic.seekForward.bind(this.sheetMusic)
+  readonly seekBackward = this.sheetMusic.seekBackward.bind(this.sheetMusic)
 }

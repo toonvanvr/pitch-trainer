@@ -19,12 +19,13 @@ export class SheetNote {
   public readonly masterBarTickLookup
   public readonly beatTickLookup
   public readonly beatTickLookupItem
+  public readonly beat
   public readonly alphatabNote
 
   public readonly note
 
   public readonly start
-  public readonly stop
+  public readonly end
 
   constructor({
     masterBarTickLookup,
@@ -36,11 +37,11 @@ export class SheetNote {
     this.masterBarTickLookup = masterBarTickLookup
     this.beatTickLookup = beatTickLookup
     this.beatTickLookupItem = beatTickLookupItem
+    this.beat = beat
     this.alphatabNote = note
+    this.note = notesByIndex[note.displayValue]
 
-    this.note = notesByIndex[note.index]
-
-    this.start = beatTickLookupItem.playbackStart
-    this.stop = beat.playbackDuration * note.durationPercent
+    this.start = beat.absolutePlaybackStart
+    this.end = this.start + beat.playbackDuration * note.durationPercent
   }
 }

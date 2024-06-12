@@ -1,6 +1,12 @@
 import { Component, OnDestroy } from '@angular/core'
 import { Line, Rect, SVG } from '@svgdotjs/svg.js'
-import { Subscription, combineLatest, map } from 'rxjs'
+import {
+  Subscription,
+  combineLatest,
+  distinctUntilChanged,
+  map,
+  shareReplay,
+} from 'rxjs'
 import { PitchDetectionService } from '../../../services/pitch-detection.service'
 import { SheetMusicService } from '../../../services/sheet-music.service'
 import { noteColor } from '../../../utils/music-theory.utils'
@@ -18,11 +24,7 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
   constructor(
     private readonly pitchDetection: PitchDetectionService,
     private readonly sheetMusic: SheetMusicService,
-  ) {
-    this.subscriptions.add(
-      this.sheetMusic.tickPosition$.subscribe((tick) => {}),
-    )
-  }
+  ) {}
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe()
@@ -32,57 +34,69 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
   pitch$ = this.pitchDetection.pitch$
 
   svgData$ = combineLatest({
-    notes: this.sheetMusic.sheetNotes,
+    notes: this.sheetMusic.sheetNotes$,
     extrema: this.sheetMusic.extrema$,
+    masterBars: this.sheetMusic.masterBars$,
   }).pipe(
-    map(({ notes, extrema }) => {
-      if (!notes || !extrema) {
+    map(({ notes, extrema, masterBars }) => {
+      if (!notes || !extrema || !masterBars) {
         return null
       }
 
       const buffer = 0
-      const minIndex = Math.max(0, extrema.minNoteIndex - buffer)
-      const maxIndex = Math.min(127, extrema.maxNoteIndex + buffer)
+      const minIndex = Math.max(0, extrema.min.note.index - buffer)
+      const maxIndex = Math.min(127, extrema.max.note.index + buffer)
       const range = maxIndex - minIndex + 1
       const end = notes[notes.length - 1].end
 
       const scaleY = 10
       const totalHeight = range * scaleY
       const totalWidth = end
-      const svg = SVG().size(totalWidth, totalHeight)
+      const svg = SVG()
+        .size(1000, totalHeight)
+        .viewbox(0, 0, totalWidth, totalHeight)
+        .attr('preserveAspectRatio', 'none')
       for (let i = 0; i < maxIndex - minIndex + 2; i++) {
         svg
           .line(0, i * scaleY, totalWidth, i * scaleY)
-          .stroke({ color: '#000', width: 1 })
+          .stroke({ color: 'rgb(196,196,196)', width: 1 })
       }
-      for (let x = 0; x < totalWidth; x += 1000) {
-        svg.line(x, 0, x, totalHeight).stroke({ color: '#000', width: 1 })
+
+      for (const { start } of masterBars) {
+        svg
+          .line(0, start * scaleY, totalWidth, start * scaleY)
+          .stroke({ color: 'rgb(224,224,224)', width: 1 })
       }
 
       const tickLine = svg
-        .line(20, 0, 20, totalHeight)
+        .line(0, 0, 0, totalHeight)
         .stroke({ color: '#f00', width: 1 })
         .addClass('tick-line')
-      // svg.add(tickLine)
+        .attr({ 'vector-effect': 'non-scaling-stroke' })
 
       const noteBars: Rect[] = []
-      for (const { noteIndex, start, end, octave } of notes) {
+      for (const {
+        start,
+        end,
+        note: { index },
+      } of notes) {
         const width = end - start
         const height = scaleY
         const x = start
-        const y = (maxIndex - noteIndex) * scaleY
+        const y = (maxIndex - index) * scaleY
 
         const noteBar = svg
           .rect(width, height)
+          .radius(scaleY / 2)
           .move(x, y)
-          .fill(noteColor(noteIndex, octave))
-          .stroke('#0f0')
+          .fill(noteColor(index))
         noteBars.push(noteBar)
-        // svg.add(noteBar)
       }
 
       return { svg, noteBars, tickLine }
     }),
+    distinctUntilChanged(),
+    shareReplay(1),
   )
 
   tickLine: Line | null = null

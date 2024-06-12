@@ -47,10 +47,14 @@ export class SheetMusicService {
   public readonly isPlaying$
   public readonly activeBeats$
   public readonly tickPosition$
+  public readonly masterBars$
 
   constructor() {
     this.alphaTab = new AlphaTabApi(this.container, {
-      core: { fontDirectory: '/assets/alphatab/font/' },
+      core: {
+        fontDirectory: '/assets/alphatab/font/',
+        includeNoteBounds: true,
+      },
       player: {
         enablePlayer: true,
         soundFont: '/assets/alphatab/soundfont/sonivox.sf2',
@@ -123,7 +127,7 @@ export class SheetMusicService {
 
     this.isPlaying$ = merge(
       this.initializing$.pipe(() => of(null)),
-      this.playerReady$.pipe(() => of(0)),
+      this.playerReady$.pipe(() => of(false)),
       fromEventPattern(
         (handler) => this.alphaTab?.playerStateChanged.on(handler),
         (handler) => this.alphaTab?.playerStateChanged.off(handler),
@@ -180,6 +184,16 @@ export class SheetMusicService {
         }),
       )
       .pipe(shareReplay(1))
+
+    this.masterBars$ = this.tickCache$.pipe(
+      map((cache) => {
+        if (!cache) {
+          return null
+        } else {
+          return cache.masterBars
+        }
+      }),
+    )
 
     this.extrema$ = this.sheetNotes$.pipe(
       map((sheetNotes) => {

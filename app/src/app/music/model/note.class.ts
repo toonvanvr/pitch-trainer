@@ -1,4 +1,4 @@
-import { octaveNotes } from '../utils/music-theory.utils'
+import { noteColor, octaveNotes } from '../utils/music-theory.utils'
 
 export class Note {
   public readonly frequency: number
@@ -7,6 +7,7 @@ export class Note {
   public readonly name
   public readonly modifier
   public readonly fullName
+  public readonly color
 
   constructor(public readonly index: number) {
     this.frequency = Math.pow(2, (index - 69) / 12) * 440
@@ -15,6 +16,7 @@ export class Note {
     const octaveNote = octaveNotes[this.octaveIndex]
     this.name = octaveNote.name
     this.modifier = octaveNote.modifier
-    this.fullName = `${this.name}${this.modifier}${this.octave}`
+    this.fullName = `${this.name}${this.modifier ?? ''}${this.octave}`
+    this.color = noteColor(this.index)
   }
 }

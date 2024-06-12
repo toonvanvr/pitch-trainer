@@ -1,6 +1,6 @@
 import { Note } from '../model/note.class'
 
-const noteIndices = Array.from({ length: 128 }).map((_, i) => i)
+export const allNoteIndices = Array.from({ length: 128 }).map((_, i) => i)
 
 export function fractionalIndexFor(frequency: number): number {
   return 12 * Math.log2(frequency / 440) + 69
@@ -21,7 +21,7 @@ export const octaveNotes = [
   { name: 'si', modifier: null },
 ]
 
-export const notesByIndex = noteIndices.map((index) => new Note(index))
+export const notesByIndex = allNoteIndices.map((index) => new Note(index))
 
 export function noteColor(index: number): string {
   const octave = Math.floor(index / 12)

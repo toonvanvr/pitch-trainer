@@ -3,8 +3,6 @@ import { Component } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { PitchDetectionService } from '../../../services/pitch-detection.service'
 import { SheetMusicService } from '../../../services/sheet-music.service'
-import { masterBarBeats } from '../../../utils/alphatab.utils'
-import { noteIndexFrequency } from '../../../utils/music-theory.utils'
 
 @Component({
   selector: 'app-pitch-trainer-sheet-music',
@@ -32,16 +30,4 @@ export class PitchTrainerSheetMusicComponent {
     this.sheetMusic.alphaTab.updateSettings()
     this.sheetMusic.alphaTab.render()
   }
-
-  playerReady$ = this.sheetMusic.playerReady$
-  rendered$ = this.sheetMusic.rendered$
-  score$ = this.sheetMusic.score$
-  soundFontLoadStatus$ = this.sheetMusic.soundFontLoadStatus$
-  tickCache$ = this.sheetMusic.tickCache$
-  extrema$ = this.sheetMusic.extrema$
-  sounds$ = this.sheetMusic.sheetNotes
-  pitch$ = this.pitchDetection.pitch$
-
-  masterBarBeats = masterBarBeats
-  noteIndexFrequencies = noteIndexFrequency
 }

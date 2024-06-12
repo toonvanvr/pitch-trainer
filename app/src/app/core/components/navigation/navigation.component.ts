@@ -24,7 +24,7 @@ export class NavigationComponent {
   pitchDetectionEnabled$: Observable<boolean>
 
   constructor(private readonly pitchDetectionService: PitchDetectionService) {
-    this.pitchDetectionEnabled$ = pitchDetectionService.enabled$
+    this.pitchDetectionEnabled$ = pitchDetectionService.isEnabled$
   }
 
   togglePitchDetection(value: boolean): void {
