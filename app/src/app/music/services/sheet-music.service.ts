@@ -48,6 +48,7 @@ export class SheetMusicService {
   public readonly activeBeats$
   public readonly tickPosition$
   public readonly masterBars$
+  public readonly playedBeat$
 
   constructor() {
     this.alphaTab = new AlphaTabApi(this.container, {
@@ -153,6 +154,15 @@ export class SheetMusicService {
       ),
     ).pipe(shareReplay(1))
 
+    this.playedBeat$ = merge(
+      this.initializing$.pipe(() => of(null)),
+      this.source$.pipe(() => of(null)),
+      fromEventPattern(
+        (handler) => this.alphaTab?.playedBeatChanged.on(handler),
+        (handler) => this.alphaTab?.playedBeatChanged.off(handler),
+      ),
+    ).pipe(shareReplay(1))
+
     this.sheetNotes$ = this.tickCache$
       .pipe(
         map((cache) => {
@@ -220,7 +230,6 @@ export class SheetMusicService {
     // this.alphaTab.beatMouseUp
     // this.alphaTab.midiLoad
     // this.alphaTab.playbackRangeChanged
-    // this.alphaTab.playedBeatChanged
     // this.alphaTab.playerFinished
     // this.alphaTab.playerPositionChanged
     // this.alphaTab.resize
