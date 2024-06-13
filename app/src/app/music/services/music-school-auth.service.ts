@@ -28,7 +28,7 @@ export class MusicSchoolAuthService {
   isAuthenticated$ = this.password$.pipe(
     map((password) => {
       localStorage.setItem('music-school-auth', password)
-      return password === 'utopia'
+      return password.trim().toLowerCase() === 'utopia'
     }),
     share(),
   )
