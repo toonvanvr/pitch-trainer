@@ -207,7 +207,7 @@ export class SheetMusicService {
                       masterBarTickLookup,
                       beatTickLookup,
                       beatTickLookupItem,
-                      transposition: 0,
+                      transposition,
                     }),
                   )
                 }
@@ -343,9 +343,9 @@ export class SheetMusicService {
     this.subscriptions.add(
       this.transpose$.pipe(distinctUntilChanged()).subscribe((transpose) => {
         this.alphaTab.settings.notation.transpositionPitches = [transpose]
-        // this.alphaTab.settings.notation.displayTranspositionPitches = [
-        //   transpose,
-        // ]
+        this.alphaTab.settings.notation.displayTranspositionPitches = [
+          -transpose,
+        ]
         this.alphaTab.updateSettings()
         this.transpose$.next(
           this.alphaTab.settings.notation.transpositionPitches[0],
