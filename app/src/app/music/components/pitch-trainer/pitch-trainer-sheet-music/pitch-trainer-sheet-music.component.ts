@@ -20,6 +20,8 @@ export class PitchTrainerSheetMusicComponent implements OnInit, OnDestroy {
     } else {
       throw new Error('Element #sheet-music is required for this app to work')
     }
+    this.sheetMusic.alphaTab.settings.player.scrollElement =
+      container.parentElement as HTMLElement
     this.sheetMusic.allowRender$.next(true)
   }
 
