@@ -53,8 +53,13 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
       const scaleY = 10
       const totalHeight = range * scaleY
       const totalWidth = end
+      const svgWidth = Math.min(screen.width * 10, screen.height * 10)
+      const svgHeight = totalHeight
+      const aspectX = totalWidth / svgWidth
+      const aspectY = totalHeight / svgHeight
+
       const svg = SVG()
-        .size(Math.min(screen.width * 10, screen.height * 10), totalHeight)
+        .size(svgWidth, svgHeight)
         .viewbox(0, 0, totalWidth, totalHeight)
         .attr('preserveAspectRatio', 'none')
       for (let i = 0; i < maxIndex - minIndex + 2; i++) {
@@ -80,6 +85,7 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
         start,
         end,
         note: { index },
+        singName,
       } of notes) {
         const width = end - start
         const height = scaleY
@@ -92,6 +98,14 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
           .move(x, y)
           .fill(noteColor(index))
         noteBars.push(noteBar)
+
+        svg
+          .text(singName)
+          .move(x + 10 * aspectX, y - scaleY * 0.7) // text anchor is center, but 10 seems to move it enough for all notes
+          .font({ size: scaleY - 1 })
+          .scale(aspectX, aspectY)
+          .attr({ 'text-anchor': 'start' })
+          .stroke('#fff')
       }
 
       const pitchBar = svg

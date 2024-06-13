@@ -5,9 +5,11 @@ import {
   Subject,
   Subscription,
   combineLatest,
+  debounce,
   distinctUntilChanged,
   first,
   fromEventPattern,
+  interval,
   map,
   merge,
   of,
@@ -38,6 +40,8 @@ export class SheetMusicService {
 
   public readonly container = document.createElement('div')
   public alphaTab: AlphaTabApi
+  public readonly needRender$ = new BehaviorSubject(true)
+  public readonly allowRender$ = new BehaviorSubject(false)
 
   public readonly metronomeVolume$ = new BehaviorSubject(1)
   public readonly masterVolume$ = new BehaviorSubject(1)
@@ -353,6 +357,34 @@ export class SheetMusicService {
       this.playbackSpeed$.pipe(distinctUntilChanged()).subscribe((speed) => {
         this.alphaTab.playbackSpeed = speed
         this.playbackSpeed$.next(speed)
+      }),
+    )
+
+    this.subscriptions.add(
+      combineLatest({
+        needRender: this.needRender$,
+        allowRender: this.allowRender$,
+      })
+        .pipe(
+          map(({ needRender, allowRender }) => needRender && allowRender),
+          debounce(() => interval(100)),
+        )
+        .subscribe((shouldRender) => {
+          if (shouldRender) {
+            this.alphaTab.render()
+            this.needRender$.next(false)
+          }
+        }),
+    )
+
+    this.subscriptions.add(
+      this.sheetNotes$.subscribe((sheetNotes) => {
+        if (sheetNotes) {
+          for (const sheetNote of sheetNotes) {
+            sheetNote.updateLyrics()
+          }
+        }
+        this.needRender$.next(true)
       }),
     )
   }

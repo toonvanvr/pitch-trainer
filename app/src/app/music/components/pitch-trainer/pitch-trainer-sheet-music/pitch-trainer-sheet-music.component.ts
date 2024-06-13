@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common'
-import { Component } from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
-import { PitchDetectionService } from '../../../services/pitch-detection.service'
 import { SheetMusicService } from '../../../services/sheet-music.service'
 
 @Component({
@@ -11,11 +10,8 @@ import { SheetMusicService } from '../../../services/sheet-music.service'
   templateUrl: './pitch-trainer-sheet-music.component.html',
   styleUrl: './pitch-trainer-sheet-music.component.scss',
 })
-export class PitchTrainerSheetMusicComponent {
-  constructor(
-    private readonly sheetMusic: SheetMusicService,
-    private readonly pitchDetection: PitchDetectionService,
-  ) {}
+export class PitchTrainerSheetMusicComponent implements OnInit, OnDestroy {
+  constructor(private readonly sheetMusic: SheetMusicService) {}
 
   ngOnInit() {
     const container = document.getElementById('sheet-music')
@@ -28,6 +24,10 @@ export class PitchTrainerSheetMusicComponent {
     const examFileUrl = new URL('/scores/examen-zang.tex', window.location.href)
     this.sheetMusic.loadFile(examFileUrl)
     this.sheetMusic.alphaTab.updateSettings()
-    this.sheetMusic.alphaTab.render()
+    this.sheetMusic.allowRender$.next(true)
+  }
+
+  ngOnDestroy() {
+    this.sheetMusic.allowRender$.next(false)
   }
 }

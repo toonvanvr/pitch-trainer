@@ -69,4 +69,8 @@ export class SheetNote {
         break
     }
   }
+
+  updateLyrics() {
+    this.beat.lyrics = [this.singName]
+  }
 }
