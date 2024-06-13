@@ -98,6 +98,9 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
           .radius(scaleY / 2)
           .move(x, y)
           .fill(noteColor(index))
+          .on('click', () => {
+            this.sheetMusic.alphaTab.tickPosition = start
+          })
         noteBars.push(noteBar)
 
         svg
@@ -107,6 +110,11 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
           .scale(aspectX, aspectY)
           .attr({ 'text-anchor': 'start' })
           .stroke('#fff')
+          .addClass('note-label')
+          // TODO: the parent should accept this + CSS for cursor/select
+          .on('click', () => {
+            this.sheetMusic.alphaTab.tickPosition = start
+          })
       }
 
       const pitchBar = svg
