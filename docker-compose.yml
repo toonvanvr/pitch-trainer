@@ -17,5 +17,5 @@ services:
       - frontend-node-modules:/app/node_modules
       - ./app:/app
     ports:
-      - 4200:4200
+      - 0.0.0.0:4200:4200
     command: yarn run start -- --host 0.0.0.0

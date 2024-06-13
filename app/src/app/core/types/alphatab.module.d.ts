@@ -1,5 +1,4 @@
 import { AlphaTabApi, Settings } from '@coderline/alphatab'
-
 // This library doesn't properly export its types, so we need to derive them
 
 export type AlphaTabApiOptions = Partial<
@@ -16,6 +15,7 @@ export type AlphaTabApiOptions = Partial<
 export type Score = Exclude<AlphaTabApi['score'], null>
 export type MidiTickLookup = Exclude<AlphaTabApi['tickCache'], null>
 export type MasterBarTickLookup = MidiTickLookup['masterBars'][number]
+export type MasterBar = MasterBarTickLookup['masterBar']
 export type BeatTickLookup = Exclude<MasterBarTickLookup['firstBeat'], null>
 export type BeatTickLookupItem = BeatTickLookup['highlightedBeats'][number]
 export type Beat = BeatTickLookup['highlightedBeats'][number]['beat']

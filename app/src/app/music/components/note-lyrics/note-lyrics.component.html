@@ -1,0 +1,23 @@
+<div class="flex flex-row items-center justify-center gap-4">
+  <div *ngIf="previousNotes$" class="flex flex-row items-center gap-2 text-lg">
+    <div *ngFor="let note of previousNotes$ | async; let i = index">
+      <div>{{ note.singName }}</div>
+    </div>
+  </div>
+  <div
+    *ngIf="currentNotes$ | async as notes"
+    class="flex flex-col justify-center gap-2 text-xl"
+  >
+    <div *ngFor="let note of notes; let i = index">
+      <div>{{ note.singName }}</div>
+    </div>
+  </div>
+  <div
+    *ngIf="upcomingNotes$ | async as notes"
+    class="flex flex-row items-center gap-2 text-lg"
+  >
+    <div *ngFor="let note of notes; let i = index">
+      <div>{{ note.singName }}</div>
+    </div>
+  </div>
+</div>

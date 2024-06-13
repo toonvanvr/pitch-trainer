@@ -55,6 +55,7 @@ export class SheetMusicService {
   public readonly tickPosition$
   public readonly masterBars$
   public readonly playedBeat$
+  public readonly sheetNoteHistory$
 
   constructor() {
     this.alphaTab = new AlphaTabApi(this.container, {
@@ -188,13 +189,13 @@ export class SheetMusicService {
               for (const beatTickLookupItem of beatTickLookup.highlightedBeats) {
                 const beat = beatTickLookupItem.beat
                 for (const note of beat.notes) {
+                  masterBarTickLookup.masterBar.keySignature
                   sheetNotes.push(
                     new SheetNote({
                       note,
                       masterBarTickLookup,
                       beatTickLookup,
                       beatTickLookupItem,
-                      beat,
                       transposition: 0,
                     }),
                   )
@@ -204,6 +205,40 @@ export class SheetMusicService {
           }
 
           return sheetNotes
+        }),
+      )
+      .pipe(shareReplay(1))
+
+    this.sheetNoteHistory$ = combineLatest({
+      sheetNotes: this.sheetNotes$,
+      tickPosition: this.tickPosition$,
+    })
+      .pipe(
+        map(({ sheetNotes, tickPosition }) => {
+          if (!sheetNotes || !tickPosition) {
+            return null
+          }
+
+          const { currentTick: now } = tickPosition
+
+          const previous: SheetNote[] = []
+          const upcoming: SheetNote[] = []
+          const current: SheetNote[] = []
+          for (const sheetNote of sheetNotes) {
+            if (sheetNote.end < now) {
+              previous.push(sheetNote)
+            } else if (sheetNote.start > now) {
+              upcoming.push(sheetNote)
+            } else {
+              current.push(sheetNote)
+            }
+          }
+
+          return {
+            previous,
+            upcoming,
+            current,
+          }
         }),
       )
       .pipe(shareReplay(1))
