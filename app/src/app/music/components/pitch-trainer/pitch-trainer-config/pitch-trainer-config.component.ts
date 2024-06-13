@@ -9,10 +9,11 @@ import { MatSelectModule } from '@angular/material/select'
 import { MatSlideToggle } from '@angular/material/slide-toggle'
 import { MatSliderModule } from '@angular/material/slider'
 import { map } from 'rxjs'
-import { PitchDetectionService } from '../../../music/services/pitch-detection.service'
-import { SheetMusicService } from '../../../music/services/sheet-music.service'
+import { PitchDetectionService } from '../../../services/pitch-detection.service'
+import { SheetMusicService } from '../../../services/sheet-music.service'
+
 @Component({
-  selector: 'app-navigation',
+  selector: 'app-pitch-trainer-config',
   standalone: true,
   imports: [
     CommonModule,
@@ -25,10 +26,10 @@ import { SheetMusicService } from '../../../music/services/sheet-music.service'
     MatSelectModule,
     MatFormFieldModule,
   ],
-  templateUrl: './navigation.component.html',
-  styleUrl: './navigation.component.scss',
+  templateUrl: './pitch-trainer-config.component.html',
+  styleUrl: './pitch-trainer-config.component.scss',
 })
-export class NavigationComponent {
+export class PitchTrainerConfigComponent {
   readonly pitchDetectionEnabled$ = this.pitchDetection.isEnabled$
   readonly masterVolume$ = this.sheetMusic.masterVolume$.pipe(
     map((v) => v * 100),
