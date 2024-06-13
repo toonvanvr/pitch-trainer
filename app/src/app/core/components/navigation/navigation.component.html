@@ -25,7 +25,7 @@
         </mat-slide-toggle>
 
         Volume
-        <mat-slider>
+        <mat-slider [min]="1" [max]="100">
           <input
             matSliderThumb
             [value]="masterVolume$ | async"
@@ -34,11 +34,23 @@
         </mat-slider>
 
         Metronoom
-        <mat-slider>
+        <mat-slider [min]="0" [max]="100">
           <input
             matSliderThumb
             [value]="metronomeVolume$ | async"
             (valueChange)="setMetronomeVolume($event)"
+          />
+        </mat-slider>
+
+        Afspeelsnelheid
+        <span *ngIf="playbackTempo$ | async as playbackTempo">
+          ({{ playbackTempo }} bpm)
+        </span>
+        <mat-slider [min]="1" [max]="200">
+          <input
+            matSliderThumb
+            [value]="playbackSpeed$ | async"
+            (valueChange)="setPlaybackSpeed($event)"
           />
         </mat-slider>
 

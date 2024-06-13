@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input'
 import { MatSelectModule } from '@angular/material/select'
 import { MatSlideToggle } from '@angular/material/slide-toggle'
 import { MatSliderModule } from '@angular/material/slider'
-import { Observable, map } from 'rxjs'
+import { map } from 'rxjs'
 import { PitchDetectionService } from '../../../music/services/pitch-detection.service'
 import { SheetMusicService } from '../../../music/services/sheet-music.service'
 @Component({
@@ -29,17 +29,25 @@ import { SheetMusicService } from '../../../music/services/sheet-music.service'
   styleUrl: './navigation.component.scss',
 })
 export class NavigationComponent {
-  pitchDetectionEnabled$: Observable<boolean>
-  masterVolume$ = this.sheetMusic.masterVolume$.pipe(map((v) => v * 100))
-  metronomeVolume$ = this.sheetMusic.metronomeVolume$.pipe(map((v) => v * 100))
-  transpose$ = this.sheetMusic.transpose$
+  readonly pitchDetectionEnabled$ = this.pitchDetection.isEnabled$
+  readonly masterVolume$ = this.sheetMusic.masterVolume$.pipe(
+    map((v) => v * 100),
+  )
+  readonly metronomeVolume$ = this.sheetMusic.metronomeVolume$.pipe(
+    map((v) => v * 100),
+  )
+  readonly transpose$ = this.sheetMusic.transpose$
+  readonly playbackSpeed$ = this.sheetMusic.playbackSpeed$.pipe(
+    map((v) => v * 100),
+  )
+  readonly playbackTempo$ = this.sheetMusic.playbackTempo$.pipe(
+    map((v) => (v ? Math.round(v) : null)),
+  )
 
   constructor(
     private readonly pitchDetection: PitchDetectionService,
     private readonly sheetMusic: SheetMusicService,
-  ) {
-    this.pitchDetectionEnabled$ = pitchDetection.isEnabled$
-  }
+  ) {}
 
   togglePitchDetection(value: boolean): void {
     this.pitchDetection.togglePitchDetection(value)
@@ -56,5 +64,9 @@ export class NavigationComponent {
 
   setTransposition(transpose: number): void {
     this.sheetMusic.transpose$.next(transpose)
+  }
+
+  setPlaybackSpeed(speed: number): void {
+    this.sheetMusic.playbackSpeed$.next(speed / 100)
   }
 }

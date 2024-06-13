@@ -42,6 +42,7 @@ export class SheetMusicService {
   public readonly metronomeVolume$ = new BehaviorSubject(1)
   public readonly masterVolume$ = new BehaviorSubject(1)
   public readonly transpose$ = new BehaviorSubject(0)
+  public readonly playbackSpeed$ = new BehaviorSubject(1)
 
   public readonly extrema$
   public readonly sheetNotes$
@@ -56,6 +57,8 @@ export class SheetMusicService {
   public readonly masterBars$
   public readonly playedBeat$
   public readonly sheetNoteHistory$
+  public readonly tempo$
+  public readonly playbackTempo$
 
   constructor() {
     this.alphaTab = new AlphaTabApi(this.container, {
@@ -69,8 +72,12 @@ export class SheetMusicService {
         outputMode: 1, // legacy mode
       },
     } satisfies AlphaTabApiOptions)
-    this.metronomeVolume$.next(this.alphaTab.metronomeVolume)
-    this.masterVolume$.next(this.alphaTab.masterVolume)
+    this.metronomeVolume$.next(this.alphaTab.metronomeVolume ?? 0)
+    this.masterVolume$.next(this.alphaTab.masterVolume ?? 1)
+    this.transpose$.next(
+      this.alphaTab.settings.notation.transpositionPitches[0] ?? 0,
+    )
+    this.playbackSpeed$.next(this.alphaTab.playbackSpeed ?? 1)
 
     // @ts-ignore
     globalThis.alphatab = this.alphaTab
@@ -253,23 +260,49 @@ export class SheetMusicService {
       }),
     )
 
-    this.extrema$ = this.sheetNotes$.pipe(
-      map((sheetNotes) => {
-        if (!sheetNotes || !sheetNotes.length) {
+    this.extrema$ = this.sheetNotes$
+      .pipe(
+        map((sheetNotes) => {
+          if (!sheetNotes || !sheetNotes.length) {
+            return null
+          }
+
+          let min = sheetNotes[0]
+          let max = sheetNotes[0]
+          for (const sheetNote of sheetNotes.slice(1)) {
+            if (sheetNote.note.index < min.note.index) {
+              min = sheetNote
+            } else if (sheetNote.note.index > max.note.index) {
+              max = sheetNote
+            }
+          }
+
+          return { min, max }
+        }),
+      )
+      .pipe(shareReplay(1))
+
+    this.tempo$ = this.score$
+      .pipe(
+        map((score) => {
+          if (!score) {
+            return null
+          }
+
+          return score.tempo
+        }),
+      )
+      .pipe(shareReplay(1))
+
+    this.playbackTempo$ = combineLatest({
+      tempo: this.tempo$,
+      playbackSpeed: this.playbackSpeed$,
+    }).pipe(
+      map(({ tempo, playbackSpeed }) => {
+        if (!tempo) {
           return null
         }
-
-        let min = sheetNotes[0]
-        let max = sheetNotes[0]
-        for (const sheetNote of sheetNotes.slice(1)) {
-          if (sheetNote.note.index < min.note.index) {
-            min = sheetNote
-          } else if (sheetNote.note.index > max.note.index) {
-            max = sheetNote
-          }
-        }
-
-        return { min, max }
+        return tempo * playbackSpeed
       }),
     )
 
@@ -313,6 +346,13 @@ export class SheetMusicService {
         this.transpose$.next(
           this.alphaTab.settings.notation.transpositionPitches[0],
         )
+      }),
+    )
+
+    this.subscriptions.add(
+      this.playbackSpeed$.pipe(distinctUntilChanged()).subscribe((speed) => {
+        this.alphaTab.playbackSpeed = speed
+        this.playbackSpeed$.next(speed)
       }),
     )
   }
