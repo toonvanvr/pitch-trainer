@@ -1,17 +1,40 @@
-<div class="content p-4 flex flex-col gap-4">
+<div class="content p-4 flex flex-col gap-4 overflow-y-scroll">
   <mat-accordion [multi]="true" [hideToggle]="true">
-    <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel>
       <mat-expansion-panel-header>
         <mat-panel-title> Zang </mat-panel-title>
       </mat-expansion-panel-header>
-      Examen oefening
+      <div>
+        <a mat-button routerLink="/pitch-trainer/examen-zang">
+          Examen oefening
+        </a>
+      </div>
     </mat-expansion-panel>
-    <!-- <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel>
       <mat-expansion-panel-header>
         <mat-panel-title> Lezen </mat-panel-title>
       </mat-expansion-panel-header>
-      Examen oefening
-    </mat-expansion-panel> -->
+      <div>
+        <a mat-button routerLink="/pitch-trainer/examen-leesoefening-1">
+          Examen Leesoefening 1
+        </a>
+      </div>
+      <div>
+        <a mat-button routerLink="/pitch-trainer/examen-leesoefening-2">
+          Examen Leesoefening 2
+        </a>
+      </div>
+      <div>
+        <a mat-button routerLink="/pitch-trainer/examen-maatslag-1">
+          Examen Maatslag 1
+        </a>
+      </div>
+      <div>
+        <a mat-button routerLink="/pitch-trainer/examen-maatslag-2">
+          Examen Maatslag 2
+        </a>
+      </div>
+    </mat-expansion-panel>
   </mat-accordion>
 
   <app-pitch-trainer-config></app-pitch-trainer-config>

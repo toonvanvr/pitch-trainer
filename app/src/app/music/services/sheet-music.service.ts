@@ -31,7 +31,7 @@ export class SheetMusicService {
   private subscriptions = new Subscription()
   private readonly initializing$ = new Subject<void>()
 
-  public readonly source$ = new Subject<ArrayBuffer>()
+  public readonly source$ = new BehaviorSubject<ArrayBuffer | null>(null)
   async loadFile(url: URL) {
     const file = await fetch(url)
     const arrayBuffer = await file.arrayBuffer()
@@ -145,6 +145,7 @@ export class SheetMusicService {
       this.initializing$.pipe(() => of(null)),
       this.source$.pipe(() => of(null)),
       this.playerReady$.pipe(map(() => this.alphaTab.tickCache)),
+      this.rendered$.pipe(map(() => this.alphaTab.tickCache)), // FIXME: chicken-egg?
     ).pipe(distinctUntilChanged(), shareReplay(1))
 
     this.isPlaying$ = merge(
@@ -322,7 +323,9 @@ export class SheetMusicService {
 
     this.subscriptions.add(
       this.source$.subscribe((arrayBuffer) => {
-        this.alphaTab?.load(arrayBuffer)
+        if (arrayBuffer) {
+          this.alphaTab?.load(arrayBuffer)
+        }
       }),
     )
 

@@ -6,16 +6,16 @@ import { musicSchoolGuard } from '../music/guards/music-school.guard'
 export const routes: Routes = [
   {
     path: '',
-    component: PitchTrainerComponent,
-    canActivate: [musicSchoolGuard],
+    pathMatch: 'full',
+    redirectTo: 'pitch-trainer/examen-zang',
   },
   {
     path: 'beveiliging',
     component: MusicSchoolAuthComponent,
   },
   {
-    path: 'pitch-trainer',
-    component: PitchTrainerComponent,
+    path: 'pitch-trainer/:source',
     canActivate: [musicSchoolGuard],
+    component: PitchTrainerComponent,
   },
 ]

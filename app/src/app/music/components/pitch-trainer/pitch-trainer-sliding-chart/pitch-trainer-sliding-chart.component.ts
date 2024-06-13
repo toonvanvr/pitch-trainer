@@ -54,7 +54,7 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
       const scaleY = 10
       const totalHeight = range * scaleY
       const totalWidth = end
-      const svgWidth = Math.min(screen.width * 10, screen.height * 10)
+      const svgWidth = Math.min(screen.width * 10, screen.height * 10, end / 10)
       const svgHeight = totalHeight
       const aspectX = totalWidth / svgWidth
       const aspectY = totalHeight / svgHeight
