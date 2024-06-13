@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common'
-import { Component } from '@angular/core'
+import { Component, Input } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatDividerModule } from '@angular/material/divider'
 import { MatIconModule } from '@angular/material/icon'
+import { MatSidenav } from '@angular/material/sidenav'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle'
 import { SheetMusicService } from '../../../services/sheet-music.service'
 
@@ -20,6 +21,9 @@ import { SheetMusicService } from '../../../services/sheet-music.service'
   styleUrl: './pitch-trainer-header.component.scss',
 })
 export class PitchTrainerHeaderComponent {
+  @Input()
+  sidenav!: MatSidenav
+
   constructor(private readonly sheetMusic: SheetMusicService) {}
 
   readonly isPlaying$ = this.sheetMusic.isPlaying$

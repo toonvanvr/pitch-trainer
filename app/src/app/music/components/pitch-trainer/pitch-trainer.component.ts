@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common'
 import { Component, OnInit } from '@angular/core'
-import { PitchDetectionScaleComponent } from '../pitch-detection-scale/pitch-detection-scale.component'
-
+import { MatSidenavModule } from '@angular/material/sidenav'
 import { ActivatedRoute } from '@angular/router'
 import { PitchDetectionService } from '../../services/pitch-detection.service'
 import { SheetMusicService } from '../../services/sheet-music.service'
 import { NavigationComponent } from '../navigation/navigation.component'
+import { PitchDetectionScaleComponent } from '../pitch-detection-scale/pitch-detection-scale.component'
 import { PitchTrainerHeaderComponent } from './pitch-trainer-header/pitch-trainer-header.component'
 import { PitchTrainerSheetMusicComponent } from './pitch-trainer-sheet-music/pitch-trainer-sheet-music.component'
 import { PitchTrainerSlidingChartComponent } from './pitch-trainer-sliding-chart/pitch-trainer-sliding-chart.component'
@@ -15,11 +15,12 @@ import { PitchTrainerSlidingChartComponent } from './pitch-trainer-sliding-chart
   standalone: true,
   imports: [
     CommonModule,
+    MatSidenavModule,
+    NavigationComponent,
     PitchDetectionScaleComponent,
     PitchTrainerHeaderComponent,
     PitchTrainerSheetMusicComponent,
     PitchTrainerSlidingChartComponent,
-    NavigationComponent,
   ],
   templateUrl: './pitch-trainer.component.html',
   styleUrl: './pitch-trainer.component.scss',
