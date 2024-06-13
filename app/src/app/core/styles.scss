@@ -12,3 +12,9 @@ body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
+
+.at-highlight * {
+  /* Defines the color of the music symbols when they are being played (svg) */
+  fill: #0078ff;
+  stroke: #0078ff;
+}
