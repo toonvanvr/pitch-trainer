@@ -11,11 +11,12 @@ import {
 import { PitchDetectionService } from '../../../services/pitch-detection.service'
 import { SheetMusicService } from '../../../services/sheet-music.service'
 import { noteColor } from '../../../utils/music-theory.utils'
+import { NoteLyricsComponent } from '../../note-lyrics/note-lyrics.component'
 
 @Component({
   selector: 'app-pitch-trainer-sliding-chart',
   standalone: true,
-  imports: [],
+  imports: [NoteLyricsComponent],
   templateUrl: './pitch-trainer-sliding-chart.component.html',
   styleUrl: './pitch-trainer-sliding-chart.component.scss',
 })

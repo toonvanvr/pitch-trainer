@@ -3,7 +3,6 @@ import { Component } from '@angular/core'
 import { PitchDetectionScaleComponent } from '../pitch-detection-scale/pitch-detection-scale.component'
 
 import { PitchDetectionService } from '../../services/pitch-detection.service'
-import { NoteLyricsComponent } from '../note-lyrics/note-lyrics.component'
 import { PitchTrainerHeaderComponent } from './pitch-trainer-header/pitch-trainer-header.component'
 import { PitchTrainerSheetMusicComponent } from './pitch-trainer-sheet-music/pitch-trainer-sheet-music.component'
 import { PitchTrainerSlidingChartComponent } from './pitch-trainer-sliding-chart/pitch-trainer-sliding-chart.component'
@@ -17,7 +16,6 @@ import { PitchTrainerSlidingChartComponent } from './pitch-trainer-sliding-chart
     PitchTrainerHeaderComponent,
     PitchTrainerSheetMusicComponent,
     PitchTrainerSlidingChartComponent,
-    NoteLyricsComponent,
   ],
   templateUrl: './pitch-trainer.component.html',
   styleUrl: './pitch-trainer.component.scss',
