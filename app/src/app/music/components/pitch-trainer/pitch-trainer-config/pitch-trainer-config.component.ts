@@ -44,6 +44,7 @@ export class PitchTrainerConfigComponent {
   readonly playbackTempo$ = this.sheetMusic.playbackTempo$.pipe(
     map((v) => (v ? Math.round(v) : null)),
   )
+  readonly showNotes$ = this.sheetMusic.showNotes$
 
   constructor(
     private readonly pitchDetection: PitchDetectionService,
@@ -52,6 +53,10 @@ export class PitchTrainerConfigComponent {
 
   togglePitchDetection(value: boolean): void {
     this.pitchDetection.togglePitchDetection(value)
+  }
+
+  toggleShowNotes(value: boolean): void {
+    this.sheetMusic.showNotes$.next(value)
   }
 
   setMasterVolume(percentage: number): void {

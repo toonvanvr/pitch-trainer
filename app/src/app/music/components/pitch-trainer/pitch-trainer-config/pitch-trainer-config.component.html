@@ -9,6 +9,13 @@
       >
       </mat-slide-toggle>
 
+      Noten weergeven
+      <mat-slide-toggle
+        [ngModel]="showNotes$ | async"
+        (change)="toggleShowNotes($event.checked)"
+      >
+      </mat-slide-toggle>
+
       Volume
       <mat-slider [min]="1" [max]="100">
         <input

@@ -72,7 +72,11 @@ export class SheetNote {
     }
   }
 
-  updateLyrics() {
-    this.beat.lyrics = [this.singName]
+  toggleLyrics(enabled: boolean) {
+    if (enabled) {
+      this.beat.lyrics = [this.singName]
+    } else {
+      this.beat.lyrics = null
+    }
   }
 }

@@ -47,6 +47,7 @@ export class SheetMusicService {
   public readonly masterVolume$ = new BehaviorSubject(1)
   public readonly transpose$ = new BehaviorSubject(0)
   public readonly playbackSpeed$ = new BehaviorSubject(1)
+  public readonly showNotes$ = new BehaviorSubject(true)
 
   public readonly extrema$
   public readonly sheetNotes$
@@ -382,10 +383,13 @@ export class SheetMusicService {
     )
 
     this.subscriptions.add(
-      this.sheetNotes$.subscribe((sheetNotes) => {
+      combineLatest({
+        sheetNotes: this.sheetNotes$,
+        showNotes: this.showNotes$.pipe(distinctUntilChanged()),
+      }).subscribe(({ sheetNotes, showNotes }) => {
         if (sheetNotes) {
           for (const sheetNote of sheetNotes) {
-            sheetNote.updateLyrics()
+            sheetNote.toggleLyrics(showNotes)
           }
         }
         this.needRender$.next(true)
