@@ -54,7 +54,7 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
       const totalHeight = range * scaleY
       const totalWidth = end
       const svg = SVG()
-        .size(Math.min(screen.width * 5, 6000), totalHeight)
+        .size(Math.min(screen.width * 10, screen.height * 10), totalHeight)
         .viewbox(0, 0, totalWidth, totalHeight)
         .attr('preserveAspectRatio', 'none')
       for (let i = 0; i < maxIndex - minIndex + 2; i++) {
@@ -140,7 +140,7 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
           const { tickLine } = svgData
           tickLine.move(tickPosition.currentTick, 0)
           tickLine.node.scrollIntoView({
-            behavior: 'smooth',
+            behavior: 'instant',
             block: 'center',
             inline: 'center',
           })
@@ -166,30 +166,5 @@ export class PitchTrainerSlidingChartComponent implements OnDestroy {
         }
       }),
     )
-
-    // this.subscriptions.add(
-    //   combineLatest({
-    //     pitch: this.pitch$,
-    //     extrema: this.sheetMusic.extrema$,
-    //     svgData: this.svgData$,
-    //     tickPosition: this.sheetMusic.tickPosition$,
-    //   }).subscribe(({ pitch, svgData, tickPosition, extrema }) => {
-    //     if (svgData && tickPosition && pitch && extrema) {
-    //       const { svg, noteBars } = svgData
-    //       const {
-    //         note: { index, octave },
-    //       } = pitch
-    //       // if (noteBar) {
-    //       //   noteBar.fill(noteColor(index))
-    //       // }
-    //       const radius = 10
-    //       const x = 1000
-    //       const y = (extrema.max.note.index - index) * 10
-    //       const color = '#f00'
-    //       svg.circle(radius).move(x, y).fill(color)
-    //       console.log('add svg', svg, { x, y, radius, color })
-    //     }
-    //   }),
-    // )
   }
 }
