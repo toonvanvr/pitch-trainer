@@ -16,7 +16,7 @@ export class MusicSchoolAuthService {
 
     this.subscriptions.add(
       this.newlyAuthenticated.subscribe(() => {
-        this.router.navigate(['/pitch-trainer'])
+        this.router.navigate(['/pitch-trainer/examen-zang'])
       }),
     )
   }
