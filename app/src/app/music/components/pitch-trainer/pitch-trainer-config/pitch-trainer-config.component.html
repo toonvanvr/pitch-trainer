@@ -38,7 +38,7 @@
       <span *ngIf="playbackTempo$ | async as playbackTempo">
         ({{ playbackTempo }} bpm)
       </span>
-      <mat-slider [min]="1" [max]="200">
+      <mat-slider [min]="25" [max]="300">
         <input
           matSliderThumb
           [value]="playbackSpeed$ | async"
