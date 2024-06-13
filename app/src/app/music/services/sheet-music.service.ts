@@ -374,6 +374,7 @@ export class SheetMusicService {
         )
         .subscribe((shouldRender) => {
           if (shouldRender) {
+            this.alphaTab.updateSettings()
             this.alphaTab.render()
             this.needRender$.next(false)
           }

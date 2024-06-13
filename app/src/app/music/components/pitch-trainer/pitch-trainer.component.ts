@@ -42,7 +42,6 @@ export class PitchTrainerComponent implements OnInit {
       }
       const url = new URL(`/scores/${baseName}.tex`, window.location.href)
       this.sheetMusic.loadFile(url)
-      this.sheetMusic.alphaTab.updateSettings()
       this.sheetMusic.needRender$.next(true)
     })
   }
