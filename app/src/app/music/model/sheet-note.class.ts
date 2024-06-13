@@ -64,9 +64,11 @@ export class SheetNote {
           this.singName = this.note.name
         }
         break
-      default:
+      case 0:
         this.singName = this.note.name
         break
+      default:
+        throw new Error('Unsupported key signature')
     }
   }
 
