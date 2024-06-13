@@ -1,6 +1,6 @@
 <div class="content p-4 flex flex-col gap-4 overflow-y-scroll">
-  <mat-accordion [multi]="true" [hideToggle]="true">
-    <mat-expansion-panel>
+  <mat-accordion [hideToggle]="true">
+    <mat-expansion-panel [expanded]="(examType$ | async) === 'zang'">
       <mat-expansion-panel-header>
         <mat-panel-title> Zang </mat-panel-title>
       </mat-expansion-panel-header>
@@ -10,7 +10,7 @@
         </a>
       </div>
     </mat-expansion-panel>
-    <mat-expansion-panel>
+    <mat-expansion-panel [expanded]="(examType$ | async) === 'leesoefening'">
       <mat-expansion-panel-header>
         <mat-panel-title> Lezen </mat-panel-title>
       </mat-expansion-panel-header>
@@ -24,6 +24,11 @@
           Examen Leesoefening 2
         </a>
       </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel [expanded]="(examType$ | async) === 'maatslag'">
+      <mat-expansion-panel-header>
+        <mat-panel-title> Maatslag </mat-panel-title>
+      </mat-expansion-panel-header>
       <div>
         <a mat-button routerLink="/pitch-trainer/examen-maatslag-1">
           Examen Maatslag 1
